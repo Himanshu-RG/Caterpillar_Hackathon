@@ -7,10 +7,7 @@ import {
   CheckCircle2,
   Calendar,
   User,
-  Cpu,
-  Layers,
   Sparkles,
-  TrendingDown,
 } from 'lucide-react';
 import { fetchTaskById } from '../api/tasks';
 import { predictTaskTime } from '../api/predictions';
@@ -60,7 +57,7 @@ export const TaskDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-xs font-mono text-slate-500">
+      <div className="py-20 text-center text-xs font-mono text-slate-400">
         Loading task work order specifications and dynamic regression forecast...
       </div>
     );
@@ -68,8 +65,8 @@ export const TaskDetailPage: React.FC = () => {
 
   if (!task) {
     return (
-      <div className="industrial-card rounded-lg p-10 text-center space-y-3">
-        <p className="text-sm font-bold text-rose-400">Task '{taskId}' was not found.</p>
+      <div className="industrial-card rounded-xl p-10 text-center space-y-3">
+        <p className="text-sm font-bold text-rose-500">Task '{taskId}' was not found.</p>
         <Button variant="secondary" onClick={() => navigate('/tasks')} icon={<ArrowLeft className="w-4 h-4" />}>
           Back to Tasks
         </Button>
@@ -96,18 +93,18 @@ export const TaskDetailPage: React.FC = () => {
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/tasks')}
-          className="p-2 rounded-lg bg-slate-900 border border-cat-border text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-cat-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-white">{task.task_type}</h1>
+            <h1 className="text-xl font-black text-slate-900 dark:text-white">{task.task_type}</h1>
             <Badge variant={pct >= 100 ? 'success' : 'warning'} size="sm">
               {pct >= 100 ? 'COMPLETED' : 'IN PROGRESS'}
             </Badge>
           </div>
-          <span className="font-mono text-xs text-slate-400">Task Dispatch ID: {task.task_id}</span>
+          <span className="font-mono text-xs text-slate-500">Task Dispatch ID: {task.task_id}</span>
         </div>
       </div>
 
@@ -117,20 +114,20 @@ export const TaskDetailPage: React.FC = () => {
           label="Planned Target"
           value={planned.toFixed(0)}
           unit="tonnes"
-          icon={<Target className="w-4 h-4 text-cat-yellow" />}
+          icon={<Target className="w-4 h-4 text-amber-500 dark:text-cat-yellow" />}
         />
         <MetricCard
           label="Completed"
           value={completed.toFixed(0)}
           unit="tonnes"
           status={pct >= 100 ? 'normal' : 'telemetry'}
-          icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+          icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
         />
         <MetricCard
           label="Remaining"
           value={remaining.toFixed(0)}
           unit="tonnes"
-          icon={<Target className="w-4 h-4 text-amber-400" />}
+          icon={<Target className="w-4 h-4 text-amber-500" />}
         />
         <MetricCard
           label="Predicted ETA"
@@ -138,7 +135,7 @@ export const TaskDetailPage: React.FC = () => {
           unit="min"
           subtitle={`Arrival: ${etaFormatted}`}
           status="normal"
-          icon={<Clock className="w-4 h-4 text-cyan-400" />}
+          icon={<Clock className="w-4 h-4 text-sky-500" />}
         />
       </div>
 
@@ -148,22 +145,22 @@ export const TaskDetailPage: React.FC = () => {
           <Card
             title="Tonnage Progress Bar"
             subtitle="Actual earth volume hauled vs dispatch allotment"
-            icon={<Target className="w-4 h-4 text-cat-yellow" />}
+            icon={<Target className="w-4 h-4 text-amber-500 dark:text-cat-yellow" />}
           >
             <div className="space-y-3">
               <div className="flex justify-between items-baseline text-xs font-mono">
-                <span className="text-slate-300 font-bold">Volume Completion:</span>
-                <span className="text-cat-yellow font-extrabold text-base">{pct}%</span>
+                <span className="text-slate-700 dark:text-slate-300 font-bold">Volume Completion:</span>
+                <span className="text-amber-600 dark:text-cat-yellow font-extrabold text-base">{pct}%</span>
               </div>
 
-              <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-300/60 dark:border-slate-700">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-cat-yellow h-full rounded-full transition-all duration-500"
                   style={{ width: `${pct}%` }}
                 />
               </div>
 
-              <div className="flex justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <span>Actual Time Spent: {task.actual_time_min?.toFixed(0) || 28} min</span>
                 <span>Original Estimate: {task.estimated_time_min?.toFixed(0) || 52} min</span>
               </div>
@@ -174,30 +171,30 @@ export const TaskDetailPage: React.FC = () => {
           <Card
             title="Dispatch Milestone Timeline"
             subtitle="Real-time chronological events"
-            icon={<Calendar className="w-4 h-4 text-cyan-400" />}
+            icon={<Calendar className="w-4 h-4 text-sky-500" />}
           >
             <div className="space-y-4 text-xs font-mono">
               <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1" />
                 <div>
-                  <span className="text-white font-bold block">Task Initialized & Shift Assigned</span>
-                  <span className="text-slate-500">{task.actual_start_time || '08:00:00 AM'}</span>
+                  <span className="text-slate-900 dark:text-white font-bold block">Task Initialized & Shift Assigned</span>
+                  <span className="text-slate-400">{task.actual_start_time || '08:00:00 AM'}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-cat-yellow mt-1 animate-ping-slow" />
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-cat-yellow mt-1 animate-ping-slow" />
                 <div>
-                  <span className="text-white font-bold block">Active Excavation Phase ({pct}%)</span>
-                  <span className="text-slate-500">Live Telemetry Synchronized</span>
+                  <span className="text-slate-900 dark:text-white font-bold block">Active Excavation Phase ({pct}%)</span>
+                  <span className="text-slate-400">Live Telemetry Synchronized</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-slate-700 mt-1" />
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-slate-700 mt-1" />
                 <div>
-                  <span className="text-slate-400 font-bold block">Predicted Target Completion</span>
-                  <span className="text-cat-yellow font-bold">{etaFormatted} (~{remMin} min remaining)</span>
+                  <span className="text-slate-600 dark:text-slate-400 font-bold block">Predicted Target Completion</span>
+                  <span className="text-amber-600 dark:text-cat-yellow font-bold">{etaFormatted} (~{remMin} min remaining)</span>
                 </div>
               </div>
             </div>
@@ -212,25 +209,25 @@ export const TaskDetailPage: React.FC = () => {
             icon={<User className="w-4 h-4 text-slate-400" />}
           >
             <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Assigned Machine:</span>
-                <span className="font-mono text-white font-bold">{task.machine_id}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400">Assigned Machine:</span>
+                <span className="font-mono text-slate-900 dark:text-white font-bold">{task.machine_id}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Assigned Operator:</span>
-                <span className="font-mono text-slate-200">{task.operator_id}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400">Assigned Operator:</span>
+                <span className="font-mono text-slate-700 dark:text-slate-200">{task.operator_id}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Cycle Baseline:</span>
-                <span className="font-mono text-emerald-400 font-semibold">42 sec / bucket</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400">Cycle Baseline:</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">42 sec / bucket</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Average Payload:</span>
-                <span className="font-mono text-slate-200">18.4 tonnes</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400">Average Payload:</span>
+                <span className="font-mono text-slate-700 dark:text-slate-200">18.4 tonnes</span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-400">Atmosphere / Site:</span>
-                <span className="text-slate-200">North Quarry (Sunny, 24°C)</span>
+                <span className="text-slate-500 dark:text-slate-400">Atmosphere / Site:</span>
+                <span className="text-slate-700 dark:text-slate-200">North Quarry (Sunny, 24°C)</span>
               </div>
             </div>
           </Card>
@@ -240,16 +237,16 @@ export const TaskDetailPage: React.FC = () => {
             <Card
               title="ML Regression Attribution"
               subtitle={`Model: ${prediction.model_version}`}
-              icon={<Sparkles className="w-4 h-4 text-cat-yellow" />}
+              icon={<Sparkles className="w-4 h-4 text-amber-500 dark:text-cat-yellow" />}
             >
               <div className="space-y-2 text-xs">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
                   Key Dynamic Factors:
                 </span>
-                <ul className="space-y-1 font-mono text-[11px] text-slate-300">
+                <ul className="space-y-1 font-mono text-[11px] text-slate-700 dark:text-slate-300">
                   {prediction.factors.map((f, idx) => (
                     <li key={idx} className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cat-yellow" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-cat-yellow" />
                       <span>{f}</span>
                     </li>
                   ))}

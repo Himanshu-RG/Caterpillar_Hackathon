@@ -1,17 +1,29 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  color-scheme: light;
+}
+
+html.dark {
   color-scheme: dark;
 }
 
 body {
-  background-color: #0B0F17;
-  color: #F8FAFC;
+  background-color: #F8FAFC;
+  color: #0F172A;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #0B0F17;
+  color: #F8FAFC;
 }
 
 /* Industrial monospace metrics */
@@ -20,39 +32,71 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom sleek dark scrollbar */
+/* Custom sleek scrollbar for light mode */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A3649;
+  background: #CBD5E1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Custom sleek scrollbar for dark mode */
+html.dark ::-webkit-scrollbar-track {
+  background: #0B0F17;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #2A3649;
+  border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
   background: #3B4A63;
 }
 
-/* Industrial Card Texture */
+/* Industrial Card Texture - Light Mode Default */
 .industrial-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.industrial-card:hover {
+  border-color: #CBD5E1;
+}
+
+/* Industrial Card Texture - Dark Mode */
+html.dark .industrial-card {
   background: linear-gradient(135deg, rgba(21, 29, 44, 0.95) 0%, rgba(17, 24, 39, 0.98) 100%);
   border: 1px solid #2A3649;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
 }
 
-.industrial-card:hover {
+html.dark .industrial-card:hover {
   border-color: #3B4A63;
 }
 
 /* Subtle grid texture for telemetry / cockpit feel */
 .bg-grid-pattern {
   background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(203, 213, 225, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(203, 213, 225, 0.35) 1px, transparent 1px);
+}
+
+html.dark .bg-grid-pattern {
   background-image: 
     linear-gradient(to right, rgba(42, 54, 73, 0.25) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(42, 54, 73, 0.25) 1px, transparent 1px);

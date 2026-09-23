@@ -1,23 +1,14 @@
 import React from 'react';
 import {
-  Gauge,
   User,
   Cpu,
-  TrendingUp,
-  TrendingDown,
-  AlertCircle,
-  Clock,
-  Fuel,
-  Activity,
-  CheckCircle,
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
 import { Card } from '../components/common/Card';
-import { MetricCard } from '../components/common/MetricCard';
 import { Badge } from '../components/common/Badge';
 
 export const BehaviorPage: React.FC = () => {
-  const { activeMachineId, dashboard, latestTelemetry, activeScenario } = useRealtime();
+  const { latestTelemetry, activeScenario } = useRealtime();
 
   const isDegrading = activeScenario === 'degrading';
   const isIdleScenario = activeScenario === 'excessive_idle';
@@ -91,13 +82,13 @@ export const BehaviorPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-cat-border/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-cat-border/60">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-cat-yellow block mb-1">
+          <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-cat-yellow block mb-1">
             Telemetry Deviation Analytics
           </span>
-          <h1 className="text-2xl font-black text-white">Unusual Behavior Detection</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">Unusual Behavior Detection</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Objective baseline benchmark comparison for machine mechanical circuits and operator pacing.
           </p>
         </div>
@@ -111,23 +102,23 @@ export const BehaviorPage: React.FC = () => {
       <Card
         title="Machine Physical Telematics Deviations"
         subtitle="Current operating parameters vs. 30-day historical equipment baseline"
-        icon={<Cpu className="w-4 h-4 text-cat-yellow" />}
+        icon={<Cpu className="w-4 h-4 text-amber-500 dark:text-cat-yellow" />}
       >
         <div className="space-y-3">
           {machineDeviations.map((item, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+              className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
             >
               <div>
-                <span className="font-bold text-white block">{item.metric}</span>
-                <span className="text-slate-400 font-mono text-[11px]">
+                <span className="font-bold text-slate-900 dark:text-white block">{item.metric}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                   Current: {item.current} · Baseline: {item.baseline}
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="font-mono text-amber-400 font-bold text-sm">
+                <span className="font-mono text-amber-600 dark:text-amber-400 font-bold text-sm">
                   {item.deviation}
                 </span>
                 <Badge
@@ -152,16 +143,16 @@ export const BehaviorPage: React.FC = () => {
       <Card
         title="Operator Work Cycle & Productivity Deviations"
         subtitle="Operator Alex Johnson (OP001) shift metrics vs. 90-day certified operator baseline"
-        icon={<User className="w-4 h-4 text-cyan-400" />}
+        icon={<User className="w-4 h-4 text-sky-500" />}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {operatorMetrics.map((item, idx) => (
             <div
               key={idx}
-              className="p-3.5 rounded-lg bg-slate-900 border border-slate-800 flex flex-col justify-between text-xs space-y-2"
+              className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between text-xs space-y-2"
             >
               <div className="flex items-start justify-between">
-                <span className="font-bold text-slate-200">{item.label}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{item.label}</span>
                 <Badge
                   variant={
                     item.status === 'UNUSUAL'
@@ -178,20 +169,20 @@ export const BehaviorPage: React.FC = () => {
 
               <div className="flex items-baseline justify-between font-mono pt-1">
                 <div>
-                  <span className="text-[10px] text-slate-500 uppercase block font-semibold">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block font-semibold">
                     Current Shift
                   </span>
-                  <span className="text-base font-extrabold text-white">{item.current}</span>
+                  <span className="text-base font-extrabold text-slate-900 dark:text-white">{item.current}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-slate-500 uppercase block font-semibold">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block font-semibold">
                     Certified Baseline
                   </span>
-                  <span className="text-sm font-semibold text-slate-400">{item.baseline}</span>
+                  <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{item.baseline}</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800 text-[11px] font-mono text-amber-400">
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] font-mono text-amber-600 dark:text-amber-400 font-semibold">
                 {item.delta}
               </div>
             </div>

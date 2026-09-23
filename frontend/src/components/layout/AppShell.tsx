@@ -6,23 +6,15 @@ import { TopBar } from './TopBar';
 import { CriticalAlertModal } from './CriticalAlertModal';
 import { NotificationDrawer } from './NotificationDrawer';
 import { AssistantDrawer } from '../ai/AssistantDrawer';
-import { useRealtime } from '../../context/RealtimeContext';
+import { GlobalStatusStrip } from './GlobalStatusStrip';
 
 export const AppShell: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
 
-  const { safetyStatus, activeSafetyAlerts, activeMachineId } = useRealtime();
-
-  // Evaluate persistent safety indicator status
-  const isCritical = safetyStatus.proximity || !safetyStatus.seatbelt;
-  const isWarning = safetyStatus.overspeed || safetyStatus.violationsCount > 0;
-
-  const safetyLevel = isCritical ? 'CRITICAL' : isWarning ? 'WARNING' : 'NORMAL';
-
   return (
-    <div className="min-h-screen bg-cat-black text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-cat-black text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Fixed Left Sidebar */}
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
@@ -39,50 +31,8 @@ export const AppShell: React.FC = () => {
           collapsed ? 'pl-16' : 'pl-64'
         }`}
       >
-        {/* Persistent Safety Status Guardian Strip */}
-        <div
-          className={`px-4 py-2 flex items-center justify-between text-xs font-bold transition-colors border-b ${
-            safetyLevel === 'CRITICAL'
-              ? 'bg-rose-950 text-rose-200 border-rose-700 shadow-glow-red'
-              : safetyLevel === 'WARNING'
-              ? 'bg-amber-950/80 text-amber-200 border-amber-700 shadow-glow-amber'
-              : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {safetyLevel === 'CRITICAL' ? (
-              <ShieldAlert className="w-4 h-4 text-rose-400 animate-bounce" />
-            ) : safetyLevel === 'WARNING' ? (
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
-            ) : (
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            )}
-
-            <span className="uppercase tracking-wider">
-              {safetyLevel === 'CRITICAL'
-                ? '🔴 IMMEDIATE ACTION REQUIRED'
-                : safetyLevel === 'WARNING'
-                ? '🟠 ATTENTION REQUIRED'
-                : '🟢 SAFETY NORMAL — ALL SYSTEMS CLEAR'}
-            </span>
-
-            <span className="text-[11px] font-normal opacity-80 hidden md:inline ml-2">
-              {safetyLevel === 'CRITICAL'
-                ? 'Obstacle or seatbelt breach detected in immediate perimeter'
-                : safetyLevel === 'WARNING'
-                ? 'Advisory safety limits exceeded'
-                : 'Seatbelt secured · 360° radar clear · Ground speed nominal'}
-            </span>
-          </div>
-
-          <Link
-            to="/safety"
-            className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider hover:underline"
-          >
-            <span>Safety Guardian</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        {/* Persistent In-Cab Global Status Strip */}
+        <GlobalStatusStrip />
 
         {/* Dynamic Route Pages */}
         <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">

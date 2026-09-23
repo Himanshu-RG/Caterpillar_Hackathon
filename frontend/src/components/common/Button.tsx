@@ -21,12 +21,18 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variantStyles: Record<ButtonVariant, string> = {
-    primary: 'bg-cat-yellow text-slate-950 font-bold hover:bg-amber-400 active:bg-amber-500 shadow-md',
-    secondary: 'bg-cat-surface-card hover:bg-slate-800 text-slate-200 border border-cat-border active:bg-slate-700',
-    cat: 'bg-cat-yellow/20 hover:bg-cat-yellow/30 text-cat-yellow border border-cat-yellow/40 active:bg-cat-yellow/40',
-    danger: 'bg-rose-900/60 hover:bg-rose-800/80 text-rose-200 border border-rose-600/70 active:bg-rose-900',
-    warning: 'bg-amber-900/60 hover:bg-amber-800/80 text-amber-200 border border-amber-600/70',
-    ghost: 'bg-transparent hover:bg-slate-800/60 text-slate-300 active:bg-slate-800',
+    primary:
+      'bg-cat-yellow hover:bg-amber-400 text-slate-950 font-bold shadow-sm active:bg-amber-500 border border-amber-500/40',
+    secondary:
+      'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-sm active:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700',
+    cat:
+      'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-semibold dark:bg-cat-yellow/20 dark:hover:bg-cat-yellow/30 dark:text-cat-yellow dark:border-cat-yellow/40',
+    danger:
+      'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold dark:bg-rose-900/60 dark:hover:bg-rose-800/80 dark:text-rose-200 dark:border-rose-600/70',
+    warning:
+      'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold dark:bg-amber-900/60 dark:hover:bg-amber-800/80 dark:text-amber-200 dark:border-amber-600/70',
+    ghost:
+      'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 active:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
   };
 
   const sizeStyles = {

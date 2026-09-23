@@ -9,6 +9,9 @@ import {
 } from '../types/telematics';
 import { fetchMachineDashboard } from '../api/machines';
 import { acknowledgeInsight as apiAcknowledgeInsight } from '../api/insights';
+import { startSimulator, stopSimulator, fetchSimulatorStatus } from '../api/simulator';
+
+import { telemetryBuffer } from '../offline/telemetryBuffer';
 
 export type ConnectionStatus = 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED';
 
@@ -36,9 +39,17 @@ export interface TelemetryHistoryPoint {
   payload_tonnes: number;
 }
 
+export interface OperatorInfo {
+  id: string;
+  name: string;
+  role: string;
+  shift: string;
+}
+
 interface RealtimeContextType {
   activeMachineId: string;
   setActiveMachineId: (id: string) => void;
+  operator: OperatorInfo;
   connectionStatus: ConnectionStatus;
   dashboard: MachineDashboard | null;
   latestTelemetry: WebSocketTelemetryPayload['telemetry'] | null;
@@ -60,7 +71,11 @@ interface RealtimeContextType {
   activeSafetyAlerts: SafetyAlert[];
   activeInsights: Insight[];
   currentTask: Task | null;
+  startTask: (task: Task) => void;
+  pauseCurrentTask: () => void;
+  completeCurrentTask: () => void;
   criticalAlert: CriticalAlertInfo | null;
+  triggerSecurityAlert: (info?: Partial<CriticalAlertInfo>) => void;
   dismissCriticalAlert: () => void;
   acknowledgeInsight: (insightId: string) => Promise<void>;
   refreshDashboard: () => Promise<void>;
@@ -68,6 +83,13 @@ interface RealtimeContextType {
   setIsPaused: (val: boolean | ((prev: boolean) => boolean)) => void;
   activeScenario: string;
   setActiveScenario: (name: string) => void;
+  isSimulating: boolean;
+  startStreamSimulator: (scenario?: string, speed?: number) => Promise<void>;
+  stopStreamSimulator: () => Promise<void>;
+  toggleStreamSimulator: () => Promise<void>;
+  isSimulatedOffline: boolean;
+  setIsSimulatedOffline: (val: boolean) => void;
+  reconnectWebSocket: () => void;
 }
 
 const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
@@ -77,7 +99,16 @@ const MAX_HISTORY = 120;
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeMachineId, setActiveMachineId] = useState<string>('EXC007');
+  const [operator] = useState<OperatorInfo>({
+    id: 'OP001',
+    name: 'Alex Johnson',
+    role: 'Certified Heavy Equipment Operator',
+    shift: 'Day Shift (07:00 – 19:00)',
+  });
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('DISCONNECTED');
+  const [isSimulatedOffline, setIsSimulatedOffline] = useState<boolean>(false);
+  const isSimulatedOfflineRef = useRef<boolean>(false);
+  isSimulatedOfflineRef.current = isSimulatedOffline;
   const [dashboard, setDashboard] = useState<MachineDashboard | null>(null);
   const [latestTelemetry, setLatestTelemetry] = useState<WebSocketTelemetryPayload['telemetry'] | null>(null);
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>([]);
@@ -99,14 +130,91 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activeInsights, setActiveInsights] = useState<Insight[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [criticalAlert, setCriticalAlert] = useState<CriticalAlertInfo | null>(null);
+  const lastDismissedHazardRef = useRef<string | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [activeScenario, setActiveScenario] = useState<string>('degrading');
+  const [activeScenario, setActiveScenario] = useState<string>('healthy');
+  const [isSimulating, setIsSimulating] = useState<boolean>(false);
+
+  // Sync with simulator status on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchSimulatorStatus()
+      .then((status) => {
+        if (mounted && status) {
+          setIsSimulating(Boolean(status.is_running));
+          if (status.current_scenario) setActiveScenario(status.current_scenario);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const startStreamSimulator = useCallback(
+    async (scenario?: string, speed = 2.0) => {
+      const targetScenario = scenario || activeScenario;
+      try {
+        await startSimulator(targetScenario, activeMachineId, speed);
+        setIsSimulating(true);
+        if (scenario) setActiveScenario(scenario);
+      } catch (err) {
+        console.warn('Could not start stream simulator:', err);
+      }
+    },
+    [activeMachineId, activeScenario]
+  );
+
+  const stopStreamSimulator = useCallback(async () => {
+    try {
+      await stopSimulator();
+      setIsSimulating(false);
+    } catch (err) {
+      console.warn('Could not stop stream simulator:', err);
+    }
+  }, []);
+
+  const toggleStreamSimulator = useCallback(async () => {
+    if (isSimulating) {
+      await stopStreamSimulator();
+    } else {
+      await startStreamSimulator();
+    }
+  }, [isSimulating, stopStreamSimulator, startStreamSimulator]);
+
+  // Single-Task Operator Actions: Operator only works on 1 task at a time
+  const startTask = useCallback((task: Task) => {
+    setCurrentTask(task);
+  }, []);
+
+  const pauseCurrentTask = useCallback(() => {
+    setCurrentTask(null);
+  }, []);
+
+  const completeCurrentTask = useCallback(() => {
+    setCurrentTask(null);
+  }, []);
+
+  // Security Alert Trigger (accessible everywhere and testable)
+  const triggerSecurityAlert = useCallback((info?: Partial<CriticalAlertInfo>) => {
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setCriticalAlert({
+      id: info?.id || `ALERT-SEC-${Date.now()}`,
+      title: info?.title || 'SECURITY ALERT: UNAUTHORIZED PERIMETER INTRUSION',
+      message: info?.message || 'Ground personnel or unauthorized vehicle detected inside the heavy equipment active swing and blast boundary (< 5.0m).',
+      severity: info?.severity || 'CRITICAL',
+      time: info?.time || timeStr,
+      machine_id: info?.machine_id || activeMachineId,
+      recommended_action: info?.recommended_action || 'HALT MACHINE MOTION IMMEDIATELY. Sound in-cab horn, engage hydraulic safety lock, and verify ground spotter clear.',
+    });
+  }, [activeMachineId]);
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<any>(null);
   const reconnectAttemptsRef = useRef<number>(0);
   const isPausedRef = useRef<boolean>(isPaused);
   isPausedRef.current = isPaused;
+  const isMountedRef = useRef<boolean>(true);
 
   // 1. Initial REST Dashboard Fetch
   const refreshDashboard = useCallback(async () => {
@@ -153,6 +261,31 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           unsafeProbability30m: 0.1,
           violationsCount: data.safety_alerts.length,
         });
+
+        // If initial machine state has an unfastened seatbelt or proximity hazard, trigger the Security Alert prompt box
+        if (!data.current_state.seatbelt_status && lastDismissedHazardRef.current !== 'seatbelt') {
+          const timeStr = data.current_state.last_timestamp ? data.current_state.last_timestamp.slice(11, 19) : new Date().toLocaleTimeString();
+          setCriticalAlert({
+            id: `CRIT-SEAT-${Date.now()}`,
+            title: 'IMMEDIATE SAFETY ALERT: SEATBELT UNFASTENED',
+            message: 'Seatbelt is unfastened while machine is active. Fasten safety harness before operating hydraulics or tramming.',
+            severity: 'CRITICAL',
+            time: timeStr,
+            machine_id: activeMachineId,
+            recommended_action: 'FASTEN SAFETY HARNESS IMMEDIATELY. In-cab lockout active until operator is buckled.',
+          });
+        } else if (data.current_state.proximity_alert && lastDismissedHazardRef.current !== 'proximity') {
+          const timeStr = data.current_state.last_timestamp ? data.current_state.last_timestamp.slice(11, 19) : new Date().toLocaleTimeString();
+          setCriticalAlert({
+            id: `CRIT-PROX-${Date.now()}`,
+            title: 'SECURITY ALERT: WORKER / OBSTACLE IN PERIMETER',
+            message: 'Proximity radar detected an obstacle or personnel within equipment danger zone (< 3.5m).',
+            severity: 'CRITICAL',
+            time: timeStr,
+            machine_id: activeMachineId,
+            recommended_action: 'HALT MACHINE MOTION IMMEDIATELY. Sound in-cab horn and verify 360° clearance.',
+          });
+        }
       }
 
       if (data.health) {
@@ -188,12 +321,30 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     refreshDashboard();
   }, [refreshDashboard]);
 
-  // 2. WebSocket Connection with Exponential Backoff
+  // 2. WebSocket Connection with Clean Handler Detachment & Backoff
   const connectWebSocket = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
+    // 1. Clear any pending reconnect timer
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
+
+    // 2. Detach handlers from existing socket before closing to prevent ghost reconnect loop
+    if (wsRef.current) {
+      const oldWs = wsRef.current;
+      wsRef.current = null;
+      oldWs.onopen = null;
+      oldWs.onmessage = null;
+      oldWs.onerror = null;
+      oldWs.onclose = null;
+      try {
+        oldWs.close();
+      } catch {
+        // ignore
+      }
+    }
+
+    if (!isMountedRef.current) return;
 
     setConnectionStatus('CONNECTING');
     const wsUrl = `${WS_BASE_URL}/ws/machines/${activeMachineId}`;
@@ -203,17 +354,26 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       wsRef.current = ws;
 
       ws.onopen = () => {
+        if (wsRef.current !== ws || !isMountedRef.current) return;
         setConnectionStatus('CONNECTED');
         reconnectAttemptsRef.current = 0;
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+          reconnectTimeoutRef.current = null;
+        }
       };
 
       ws.onmessage = (event) => {
+        if (wsRef.current !== ws || !isMountedRef.current) return;
         try {
           const packet: WebSocketTelemetryPayload = JSON.parse(event.data);
           if (!packet || !packet.telemetry) return;
 
-          // Check for pause
-          if (isPausedRef.current) return;
+          // Check for pause or simulated offline drop
+          if (isPausedRef.current || isSimulatedOfflineRef.current) return;
+
+          // Feed into in-cab rolling telemetry buffer
+          telemetryBuffer.addPacket(packet);
 
           // Update Latest Telemetry
           setLatestTelemetry(packet.telemetry);
@@ -240,6 +400,9 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
           // Update Safety
           if (packet.safety) {
+            const sb = packet.safety.seatbelt ?? true;
+            const prox = packet.safety.proximity ?? false;
+
             setSafetyStatus((prev) => ({
               ...prev,
               seatbelt: packet.safety.seatbelt ?? prev.seatbelt,
@@ -249,26 +412,34 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               unsafeProbability30m: packet.predictions?.unsafe_probability_30m ?? prev.unsafeProbability30m,
             }));
 
+            // Reset dismissed state when hazard condition clears
+            if (sb && lastDismissedHazardRef.current === 'seatbelt') {
+              lastDismissedHazardRef.current = null;
+            }
+            if (!prox && lastDismissedHazardRef.current === 'proximity') {
+              lastDismissedHazardRef.current = null;
+            }
+
             // Check for critical alert popup
-            if (packet.safety.proximity) {
+            if (prox && lastDismissedHazardRef.current !== 'proximity') {
               setCriticalAlert({
                 id: `CRIT-PROX-${Date.now()}`,
-                title: 'CRITICAL PROXIMITY HAZARD',
+                title: 'SECURITY ALERT: WORKER / OBSTACLE IN PERIMETER',
                 message: 'Personnel or structure detected within obstacle perimeter (< 3.5m).',
                 severity: 'CRITICAL',
                 time: timeStr,
                 machine_id: packet.machine_id,
-                recommended_action: 'HALT MACHINE MOTION IMMEDIATELY. Sound horn and verify spotters.',
+                recommended_action: 'HALT MACHINE MOTION IMMEDIATELY. Sound horn, engage safety brake, and notify supervisor.',
               });
-            } else if (packet.safety.seatbelt === false && (packet.telemetry.speed_kmh ?? 0) > 1.0) {
+            } else if (!sb && lastDismissedHazardRef.current !== 'seatbelt') {
               setCriticalAlert({
                 id: `CRIT-SEAT-${Date.now()}`,
-                title: 'SEATBELT UNFASTENED IN MOTION',
-                message: 'Machine is actively in gear without operator seatbelt buckled.',
+                title: 'IMMEDIATE SAFETY ALERT: SEATBELT UNFASTENED',
+                message: 'Operator seatbelt is unfastened while machine is active. Operating heavy equipment without restraint poses severe hazard.',
                 severity: 'CRITICAL',
                 time: timeStr,
                 machine_id: packet.machine_id,
-                recommended_action: 'Fasten safety belt immediately before continuing travel.',
+                recommended_action: 'FASTEN SAFETY HARNESS IMMEDIATELY. In-cab motion locked until buckled.',
               });
             }
           }
@@ -281,6 +452,37 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               signals: packet.predictions.signals ?? [],
               horizon: '50 operating hours',
             });
+          }
+
+          // Update Derived Health dynamically from live telematics & ML
+          if (packet.predictions || packet.telemetry) {
+            const hyd = packet.telemetry?.hydraulic_temp ?? 70;
+            const oil = packet.telemetry?.oil_pressure ?? 3.8;
+            const cool = packet.telemetry?.coolant_temp ?? 82;
+            const risk = packet.predictions?.risk_level ?? 'LOW';
+            const failProb = packet.predictions?.failure_probability ?? 0.04;
+
+            let liveStatus: 'NORMAL' | 'ATTENTION' | 'CRITICAL' = 'NORMAL';
+            if (risk === 'HIGH' || hyd >= 88 || oil <= 2.4 || cool >= 94) {
+              liveStatus = 'CRITICAL';
+            } else if (risk === 'MEDIUM' || hyd >= 80 || oil <= 2.8 || cool >= 89) {
+              liveStatus = 'ATTENTION';
+            }
+
+            let liveTrend: 'STABLE' | 'DEGRADING' | 'CRITICAL' = 'STABLE';
+            if (liveStatus === 'CRITICAL') liveTrend = 'CRITICAL';
+            else if (liveStatus === 'ATTENTION') liveTrend = 'DEGRADING';
+
+            setDerivedHealth((prev) => ({
+              machine_id: packet.machine_id || prev?.machine_id || activeMachineId,
+              health_status: liveStatus,
+              failure_probability: failProb,
+              trend: liveTrend,
+              prediction_horizon: '50 operating hours',
+              active_anomalies: hyd >= 80 ? ['Elevated Hydraulic Temperature'] : [],
+              recent_fault_code: packet.telemetry?.fault_code || prev?.recent_fault_code || 'NONE',
+              recommendations: packet.predictions?.signals ?? prev?.recommendations ?? [],
+            }));
           }
 
           // Update Insights
@@ -311,30 +513,68 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       ws.onerror = () => {
-        setConnectionStatus('DISCONNECTED');
+        if (wsRef.current !== ws || !isMountedRef.current) return;
       };
 
       ws.onclose = () => {
+        // Discard close events from old or abandoned sockets
+        if (wsRef.current !== ws || !isMountedRef.current) return;
+
         setConnectionStatus('DISCONNECTED');
         const attempts = reconnectAttemptsRef.current;
         const delay = Math.min(1000 * Math.pow(1.5, attempts), 8000);
         reconnectAttemptsRef.current += 1;
+
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+        }
         reconnectTimeoutRef.current = setTimeout(() => {
-          connectWebSocket();
+          if (isMountedRef.current) {
+            connectWebSocket();
+          }
         }, delay);
       };
     } catch (e) {
-      setConnectionStatus('DISCONNECTED');
+      if (isMountedRef.current) {
+        setConnectionStatus('DISCONNECTED');
+      }
     }
   }, [activeMachineId]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     connectWebSocket();
+
+    // Heartbeat ping every 25 seconds to keep connection alive through proxies/NAT
+    const heartbeatInterval = setInterval(() => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        try {
+          wsRef.current.send('ping');
+        } catch {
+          // ignore
+        }
+      }
+    }, 25000);
+
     return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      isMountedRef.current = false;
+      clearInterval(heartbeatInterval);
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (wsRef.current) {
-        wsRef.current.close();
+        const oldWs = wsRef.current;
         wsRef.current = null;
+        oldWs.onopen = null;
+        oldWs.onmessage = null;
+        oldWs.onerror = null;
+        oldWs.onclose = null;
+        try {
+          oldWs.close();
+        } catch {
+          // ignore
+        }
       }
     };
   }, [connectWebSocket]);
@@ -352,14 +592,32 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const dismissCriticalAlert = () => {
+    if (criticalAlert) {
+      if (criticalAlert.id.includes('SEAT') || criticalAlert.title.includes('SEATBELT')) {
+        lastDismissedHazardRef.current = 'seatbelt';
+      } else if (
+        criticalAlert.id.includes('PROX') ||
+        criticalAlert.title.includes('PROXIMITY') ||
+        criticalAlert.title.includes('PERIMETER') ||
+        criticalAlert.title.includes('WORKER')
+      ) {
+        lastDismissedHazardRef.current = 'proximity';
+      }
+    }
     setCriticalAlert(null);
   };
+
+  const reconnectWebSocket = useCallback(() => {
+    reconnectAttemptsRef.current = 0;
+    connectWebSocket();
+  }, [connectWebSocket]);
 
   return (
     <RealtimeContext.Provider
       value={{
         activeMachineId,
         setActiveMachineId,
+        operator,
         connectionStatus,
         dashboard,
         latestTelemetry,
@@ -370,7 +628,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         activeSafetyAlerts,
         activeInsights,
         currentTask,
+        startTask,
+        pauseCurrentTask,
+        completeCurrentTask,
         criticalAlert,
+        triggerSecurityAlert,
         dismissCriticalAlert,
         acknowledgeInsight,
         refreshDashboard,
@@ -378,6 +640,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setIsPaused,
         activeScenario,
         setActiveScenario,
+        isSimulating,
+        startStreamSimulator,
+        stopStreamSimulator,
+        toggleStreamSimulator,
+        isSimulatedOffline,
+        setIsSimulatedOffline,
+        reconnectWebSocket,
       }}
     >
       {children}

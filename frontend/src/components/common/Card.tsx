@@ -27,16 +27,17 @@ export const Card: React.FC<CardProps> = ({
   variant = 'default',
 }) => {
   const borderVariants = {
-    default: 'border-cat-border/80 hover:border-cat-border',
-    danger: 'border-rose-600/70 shadow-glow-red',
-    warning: 'border-amber-600/70 shadow-glow-amber',
-    cat: 'border-cat-yellow/60 shadow-glow-amber',
+    default:
+      'border-slate-200 hover:border-slate-300 dark:border-cat-border/80 dark:hover:border-cat-border',
+    danger: 'border-rose-300 dark:border-rose-600/70 shadow-sm dark:shadow-glow-red',
+    warning: 'border-amber-300 dark:border-amber-600/70 shadow-sm dark:shadow-glow-amber',
+    cat: 'border-amber-400 dark:border-cat-yellow/60 shadow-sm dark:shadow-glow-amber',
   };
 
   return (
     <div
       className={clsx(
-        'industrial-card rounded-lg relative overflow-hidden transition-all duration-200',
+        'industrial-card rounded-xl relative overflow-hidden transition-all duration-200',
         borderVariants[variant],
         className
       )}
@@ -44,26 +45,30 @@ export const Card: React.FC<CardProps> = ({
       {(title || action || icon || badge) && (
         <div
           className={clsx(
-            'px-4 py-3.5 border-b border-cat-border/60 flex items-center justify-between gap-3 bg-slate-900/60',
+            'px-4 py-3 border-b border-slate-100 dark:border-cat-border/60 flex items-center justify-between gap-3 bg-slate-50/60 dark:bg-slate-900/60',
             headerClassName
           )}
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            {icon && <span className="text-cat-muted flex-shrink-0">{icon}</span>}
+            {icon && <span className="text-slate-500 dark:text-cat-muted flex-shrink-0">{icon}</span>}
             <div className="min-w-0">
               {title && (
-                <h3 className="text-xs uppercase tracking-wider font-bold text-slate-300 truncate">
+                <h3 className="text-xs uppercase tracking-wider font-bold text-slate-800 dark:text-slate-200 truncate">
                   {title}
                 </h3>
               )}
-              {subtitle && <p className="text-xs text-slate-400 truncate">{subtitle}</p>}
+              {subtitle && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{subtitle}</p>
+              )}
             </div>
             {badge && <div className="ml-2 flex-shrink-0">{badge}</div>}
           </div>
           {action && <div className="flex items-center gap-2 flex-shrink-0">{action}</div>}
         </div>
       )}
-      <div className={clsx('p-4', bodyClassName)}>{children}</div>
+      <div className={clsx('p-4 text-slate-800 dark:text-slate-100', bodyClassName)}>
+        {children}
+      </div>
     </div>
   );
 };

@@ -2,13 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   AlertOctagon,
   Plus,
-  ShieldAlert,
-  Clock,
   CheckCircle,
   X,
-  AlertTriangle,
-  User,
-  Filter,
 } from 'lucide-react';
 import { fetchIncidents, createIncident } from '../api/incidents';
 import { Incident } from '../types/telematics';
@@ -76,13 +71,13 @@ export const IncidentsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-cat-border/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-cat-border/60">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-cat-yellow block mb-1">
+          <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-cat-yellow block mb-1">
             Site Compliance & Incident Reporting
           </span>
-          <h1 className="text-2xl font-black text-white">Operational Incident Logs</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">Operational Incident Logs</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Real-time hazard notifications, equipment collisions, near-misses, and safety audit logs.
           </p>
         </div>
@@ -101,8 +96,8 @@ export const IncidentsPage: React.FC = () => {
       </div>
 
       {successBanner && (
-        <div className="rounded-lg bg-emerald-950/80 border border-emerald-600/70 p-3.5 flex items-center gap-2 text-xs font-bold text-emerald-300 animate-in fade-in">
-          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-600/70 p-3.5 flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300 animate-in fade-in shadow-sm">
+          <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
           <span>Incident report logged successfully to backend telematics database!</span>
         </div>
       )}
@@ -112,22 +107,22 @@ export const IncidentsPage: React.FC = () => {
         title="Fleet Incident Registry"
         subtitle="All logged incidents across active site operations"
         icon={<AlertOctagon className="w-4 h-4 text-rose-500" />}
-        badge={<span className="font-mono text-xs text-slate-400">{incidents.length} total</span>}
+        badge={<span className="font-mono text-xs text-slate-500">{incidents.length} total</span>}
       >
         {loading ? (
-          <p className="text-xs text-slate-500 py-8 text-center font-mono">
+          <p className="text-xs text-slate-400 py-8 text-center font-mono">
             Querying incidents from telematics database...
           </p>
         ) : incidents.length === 0 ? (
-          <div className="py-12 text-center text-slate-500">
+          <div className="py-12 text-center text-slate-400">
             <CheckCircle className="w-10 h-10 mx-auto mb-2 text-emerald-500/40" />
-            <p className="text-xs font-semibold text-slate-400">Zero logged incidents recorded</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-400">Zero logged incidents recorded</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-cat-border text-slate-400 uppercase font-bold text-[10px]">
+                <tr className="border-b border-slate-200 dark:border-cat-border text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px]">
                   <th className="py-2.5 px-3">Incident ID</th>
                   <th className="py-2.5 px-3">Timestamp</th>
                   <th className="py-2.5 px-3">Machine</th>
@@ -137,14 +132,14 @@ export const IncidentsPage: React.FC = () => {
                   <th className="py-2.5 px-3">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {incidents.map((inc) => (
-                  <tr key={inc.incident_id} className="hover:bg-slate-900/60">
-                    <td className="py-3 px-3 text-slate-400 font-bold">{inc.incident_id}</td>
-                    <td className="py-3 px-3 text-slate-400">{inc.timestamp.slice(0, 19).replace('T', ' ')}</td>
-                    <td className="py-3 px-3 text-white font-bold">{inc.machine_id}</td>
-                    <td className="py-3 px-3 text-slate-300">{inc.operator_id}</td>
-                    <td className="py-3 px-3 text-slate-200">{inc.incident_type.replace(/_/g, ' ')}</td>
+                  <tr key={inc.incident_id} className="hover:bg-slate-50 dark:hover:bg-slate-900/60">
+                    <td className="py-3 px-3 text-slate-500 dark:text-slate-400 font-bold">{inc.incident_id}</td>
+                    <td className="py-3 px-3 text-slate-600 dark:text-slate-400">{inc.timestamp.slice(0, 19).replace('T', ' ')}</td>
+                    <td className="py-3 px-3 text-slate-900 dark:text-white font-bold">{inc.machine_id}</td>
+                    <td className="py-3 px-3 text-slate-700 dark:text-slate-300">{inc.operator_id}</td>
+                    <td className="py-3 px-3 text-slate-800 dark:text-slate-200">{inc.incident_type.replace(/_/g, ' ')}</td>
                     <td className="py-3 px-3">
                       <Badge
                         variant={
@@ -159,7 +154,7 @@ export const IncidentsPage: React.FC = () => {
                         {inc.severity}
                       </Badge>
                     </td>
-                    <td className="py-3 px-3 text-slate-300 font-sans max-w-xs truncate">
+                    <td className="py-3 px-3 text-slate-700 dark:text-slate-300 font-sans max-w-xs truncate">
                       {inc.description}
                     </td>
                   </tr>
@@ -172,18 +167,18 @@ export const IncidentsPage: React.FC = () => {
 
       {/* Incident Creation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
-          <div className="industrial-card max-w-lg w-full rounded-xl p-6 border-cat-border space-y-4">
-            <div className="flex items-center justify-between border-b border-cat-border/60 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
+          <div className="industrial-card max-w-lg w-full rounded-2xl p-6 border-slate-200 dark:border-cat-border shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-cat-border/60 pb-3">
               <div className="flex items-center gap-2">
                 <AlertOctagon className="w-5 h-5 text-rose-500" />
-                <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                   Log Operational Safety Incident
                 </h3>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -192,7 +187,7 @@ export const IncidentsPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 uppercase font-bold text-[10px] block mb-1">
+                  <label className="text-slate-600 dark:text-slate-400 uppercase font-bold text-[10px] block mb-1">
                     Machine ID
                   </label>
                   <input
@@ -200,12 +195,12 @@ export const IncidentsPage: React.FC = () => {
                     value={machineId}
                     onChange={(e) => setMachineId(e.target.value)}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-mono focus:border-cat-yellow focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white font-mono focus:border-amber-500 dark:focus:border-cat-yellow focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 uppercase font-bold text-[10px] block mb-1">
+                  <label className="text-slate-600 dark:text-slate-400 uppercase font-bold text-[10px] block mb-1">
                     Operator ID
                   </label>
                   <input
@@ -213,20 +208,20 @@ export const IncidentsPage: React.FC = () => {
                     value={operatorId}
                     onChange={(e) => setOperatorId(e.target.value)}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-mono focus:border-cat-yellow focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white font-mono focus:border-amber-500 dark:focus:border-cat-yellow focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 uppercase font-bold text-[10px] block mb-1">
+                  <label className="text-slate-600 dark:text-slate-400 uppercase font-bold text-[10px] block mb-1">
                     Incident Type
                   </label>
                   <select
                     value={incidentType}
                     onChange={(e) => setIncidentType(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-cat-yellow focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:border-amber-500 dark:focus:border-cat-yellow focus:outline-none cursor-pointer"
                   >
                     <option value="PROXIMITY_HAZARD">Proximity Hazard</option>
                     <option value="SEATBELT_VIOLATION">Seatbelt Non-Compliance</option>
@@ -238,13 +233,13 @@ export const IncidentsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-slate-400 uppercase font-bold text-[10px] block mb-1">
+                  <label className="text-slate-600 dark:text-slate-400 uppercase font-bold text-[10px] block mb-1">
                     Severity
                   </label>
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-cat-yellow focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:border-amber-500 dark:focus:border-cat-yellow focus:outline-none cursor-pointer"
                   >
                     <option value="CRITICAL">Critical (Immediate Stop)</option>
                     <option value="HIGH">High (Action Required)</option>
@@ -255,7 +250,7 @@ export const IncidentsPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-slate-400 uppercase font-bold text-[10px] block mb-1">
+                <label className="text-slate-600 dark:text-slate-400 uppercase font-bold text-[10px] block mb-1">
                   Incident Description & Field Notes
                 </label>
                 <textarea
@@ -264,11 +259,11 @@ export const IncidentsPage: React.FC = () => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Detail observations, proximity distances, personnel involved, or machine behavior..."
                   required
-                  className="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-white placeholder-slate-500 focus:border-cat-yellow focus:outline-none resize-none"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 dark:focus:border-cat-yellow focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <Button
                   type="button"
                   variant="secondary"

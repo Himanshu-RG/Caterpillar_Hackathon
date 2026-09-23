@@ -131,9 +131,17 @@ def main():
     parser.add_argument("--mode", type=str, default="replay", choices=["replay", "live"], help="Simulator mode")
     parser.add_argument("--limit", type=int, default=60, help="Number of telemetry packets to emit")
     parser.add_argument("--ingest-url", type=str, default=None, help="HTTP API ingestion URL (e.g. http://localhost:8000/api/telemetry/ingest)")
+    parser.add_argument("--target", type=str, default=None, help="Target backend host URL (e.g. http://localhost:8000)")
+    parser.add_argument("--loop", action="store_true", help="Continuously loop simulation packets")
     parser.add_argument("--no-sleep", action="store_true", help="Run without sleeping (fast evaluation)")
 
     args = parser.parse_args()
+
+    # Normalize target URL
+    target_url = args.ingest_url or args.target
+    if target_url:
+        if not target_url.endswith("/api/telemetry/ingest"):
+            target_url = target_url.rstrip("/") + "/api/telemetry/ingest"
 
     scenario = ScenarioController.get_scenario(args.scenario)
     machine_id = args.machine or scenario.machine_id
@@ -148,7 +156,9 @@ def main():
     logger.info("Description       : %s", scenario.description)
     logger.info("Simulator Mode    : %s", args.mode.upper())
     logger.info("Speed Multiplier  : %.1fx (Packet interval: %.2fs)", args.speed, args.interval / args.speed)
-    logger.info("Packet Limit      : %d packets", limit)
+    logger.info("Packet Limit      : %d packets %s", limit, "(continuous loop)" if args.loop else "")
+    if target_url:
+        logger.info("Target Ingest URL : %s", target_url)
     logger.info("=" * 65)
 
     simulator = TelemetrySimulator(
@@ -169,28 +179,33 @@ def main():
 
     packet_count = 0
     try:
-        stream = simulator.run_simulation(
-            machine_id=machine_id,
-            start_index=start_index,
-            limit=limit,
-            sleep_between_packets=not args.no_sleep,
-        )
+        while True:
+            stream = simulator.run_simulation(
+                machine_id=machine_id,
+                start_index=start_index,
+                limit=limit,
+                sleep_between_packets=not args.no_sleep,
+            )
 
-        for packet in stream:
-            packet_count += 1
-            if args.ingest_url:
-                try:
-                    resp = requests.post(args.ingest_url, json=packet, timeout=3.0)
-                    if resp.status_code == 200:
-                        logger.info("Forwarded packet %d to HTTP backend (status 200)", packet_count)
-                    else:
-                        logger.warning("Backend returned %d: %s", resp.status_code, resp.text)
-                except Exception as exc:
-                    logger.error("Failed to connect to backend at %s: %s", args.ingest_url, exc)
-            else:
-                run_standalone_pipeline(
-                    packet, db, feature_engine, safety_rules, machine_rules, failure_pred, safety_pred, insight_engine
-                )
+            for packet in stream:
+                packet_count += 1
+                if target_url:
+                    try:
+                        resp = requests.post(target_url, json=packet, timeout=3.0)
+                        if resp.status_code == 200:
+                            logger.info("Forwarded packet %d to HTTP backend (status 200)", packet_count)
+                        else:
+                            logger.warning("Backend returned %d: %s", resp.status_code, resp.text)
+                    except Exception as exc:
+                        logger.error("Failed to connect to backend at %s: %s", target_url, exc)
+                else:
+                    run_standalone_pipeline(
+                        packet, db, feature_engine, safety_rules, machine_rules, failure_pred, safety_pred, insight_engine
+                    )
+
+            if not args.loop:
+                break
+            logger.info("Restarting loop for scenario '%s' (packets emitted so far: %d)...", scenario.name, packet_count)
 
         logger.info("=" * 65)
         logger.info("SIMULATION COMPLETED: %d packets processed successfully.", packet_count)
