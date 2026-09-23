@@ -1,0 +1,42 @@
+{
+  "model_name": "operator_safety_risk_model",
+  "model_version": "1.0.0",
+  "algorithm": "RandomForestClassifier",
+  "training_date": "2026-09-23T10:49:51.835790+00:00",
+  "target": "unsafe_operation_next_30min",
+  "prediction_horizon": "30 minutes (steps t+1 to t+6)",
+  "feature_list": [
+    "speed_kmh",
+    "engine_load_pct",
+    "payload_tonnes",
+    "years_experience",
+    "historical_safety_score",
+    "visibility_km",
+    "wind_speed_kmh",
+    "safety_events_24h",
+    "average_cycle_time",
+    "idle_percentage"
+  ],
+  "feature_order": [
+    "speed_kmh",
+    "engine_load_pct",
+    "payload_tonnes",
+    "years_experience",
+    "historical_safety_score",
+    "visibility_km",
+    "wind_speed_kmh",
+    "safety_events_24h",
+    "average_cycle_time",
+    "idle_percentage"
+  ],
+  "feature_count": 10,
+  "hyperparameters": {
+    "n_estimators": 60,
+    "max_depth": 8,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "training_samples": 60479,
+  "random_seed": 42,
+  "leakage_prevention": "Strict: step-t safety flags excluded; relies on context, experience, and historical aggregations."
+}

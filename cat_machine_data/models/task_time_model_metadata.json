@@ -1,0 +1,43 @@
+{
+  "model_name": "task_completion_time_regressor",
+  "model_version": "1.0.0",
+  "algorithm": "RandomForestRegressor",
+  "training_date": "2026-09-23T10:49:52.002533+00:00",
+  "target": "actual_time_min",
+  "target_unit": "minutes",
+  "feature_list": [
+    "planned_quantity_tonnes",
+    "estimated_time_min",
+    "machine_age_years",
+    "weather_rainy",
+    "weather_windy",
+    "skill_expert",
+    "skill_beginner",
+    "type_Earth Excavation",
+    "type_Grading",
+    "type_Material Loading",
+    "type_Trenching"
+  ],
+  "feature_order": [
+    "planned_quantity_tonnes",
+    "estimated_time_min",
+    "machine_age_years",
+    "weather_rainy",
+    "weather_windy",
+    "skill_expert",
+    "skill_beginner",
+    "type_Earth Excavation",
+    "type_Grading",
+    "type_Material Loading",
+    "type_Trenching"
+  ],
+  "feature_count": 11,
+  "hyperparameters": {
+    "n_estimators": 60,
+    "max_depth": 8,
+    "random_state": 42
+  },
+  "training_samples": 420,
+  "random_seed": 42,
+  "leakage_prevention": "Strict: only pre-dispatch parameters consumed; no post-task duration or delay reason."
+}

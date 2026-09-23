@@ -152,40 +152,74 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Running the Data Generator
+### Quickstart: One-Command Live Demo
+To immediately launch the database, start the FastAPI backend, and stream the primary `degrading` scenario (`EXC007`):
 ```bash
-# Generate default demo dataset (10 machines, 30 days, ~86,400 telemetry rows)
-python scripts/generate_dataset.py --demo
-
-# Or generate full production scale (30 machines, 6 months, ~1.5 million rows)
-python scripts/generate_dataset.py --config config.yaml
-```
-
-### Validating the Dataset
-```bash
-python scripts/validate_dataset.py
-```
-
-### Running Automated Test Suite
-```bash
-pytest tests/ -v
-```
-
-### Training Baseline ML Models
-```bash
-python scripts/train_baseline_models.py
-```
-
-### Regenerating EDA Plots
-```bash
-python src/eda_plots.py
+python scripts/run_demo.py --scenario degrading --speed 2.0
 ```
 
 ---
 
-## 8. Downstream Solution Integration
+## 8. Real-Time Telematics & Intelligence Platform
 
-The generated datasets cleanly power modern full-stack analytics applications:
-1. **Frontend Mock / Live Demo**: Use files in `data/sample/` (`sample_telemetry.csv`, `sample_tasks.csv`, `sample_safety_events.csv`) for quick loading in frontend prototypes (React, Next.js, Dash, or Streamlit).
-2. **Real-Time Streaming Simulation**: Stream `data/raw/telemetry.csv` line-by-line via Kafka or WebSocket into in-cab assistant dashboards.
-3. **ML Serving**: Load trained models from `baseline_models.py` into FastAPI microservices to deliver live predictions to operators and site managers.
+The platform includes a real-time simulator, database-backed data hub, streaming feature engine, ML inference pipeline, rule engine, and FastAPI REST/WebSocket server.
+
+### 8.1 Setup & Initialization
+
+```bash
+# 1. Initialize SQLite/PostgreSQL Database
+python scripts/init_database.py
+
+# 2. Ingest Historical Data into the Data Hub
+python scripts/load_historical_data.py
+
+# 3. Train and Persist Leak-Free ML Models & Metadata JSON
+python scripts/train_and_save_models.py
+```
+
+### 8.2 Starting the FastAPI Backend
+```bash
+python scripts/run_backend.py
+```
+- Interactive Swagger/OpenAPI Documentation: `http://localhost:8000/docs`
+- Health Check: `http://localhost:8000/api/health`
+- Fleet Summary: `http://localhost:8000/api/fleet/summary`
+- Machine Dashboard Aggregator: `http://localhost:8000/api/machines/EXC007/dashboard`
+
+### 8.3 Running the Live Machine Simulator
+In a second terminal, launch any of the 5 deterministic demo scenarios:
+```bash
+# Scenario 1 (Primary): Degrading hydraulic system on EXC007
+python scripts/start_simulator.py --scenario degrading --speed 2.0
+
+# Scenario 2: Healthy baseline operation on EXC001
+python scripts/start_simulator.py --scenario healthy
+
+# Scenario 3: Chronic excessive idling & fuel waste on EXC004
+python scripts/start_simulator.py --scenario excessive_idle
+
+# Scenario 4: Active safety infractions & proximity hazard on EXC008
+python scripts/start_simulator.py --scenario unsafe
+
+# Scenario 5: High productivity loading workhorse on LOD001
+python scripts/start_simulator.py --scenario productivity
+```
+
+### 8.4 WebSocket Streaming Protocol
+Connect to `ws://localhost:8000/ws/machines/{machine_id}` (or `ws://localhost:8000/ws/machines/fleet`) to receive real-time JSON packets containing:
+- Instantaneous CAN-bus telemetry
+- In-cab safety alert evaluations
+- ML failure and safety risk probabilities
+- Actionable intelligence insights and work orders
+
+Detailed architecture diagrams, sequence flows, and schemas are available in [docs/REALTIME_ARCHITECTURE.md](docs/REALTIME_ARCHITECTURE.md).
+
+---
+
+## 9. Verification & Testing
+
+Run the comprehensive 34-test suite covering deterministic generation, schema integrity, zero target leakage, real-time feature computation, rule evaluation, ML inference, and REST/WebSocket APIs:
+```bash
+pytest tests/ -v
+```
+
