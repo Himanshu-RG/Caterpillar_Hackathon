@@ -1,0 +1,25 @@
+fleet:
+  num_machines: 30
+  num_operators: 50
+
+simulation:
+  start_date: "2026-01-01"
+  end_date: "2026-06-30"
+  telemetry_interval_minutes: 5
+  random_seed: 42
+
+output:
+  format: "csv"
+  generate_parquet: true
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  sample_dir: "data/sample"
+  plots_dir: "data/processed/plots"
+
+demo:
+  num_machines: 10
+  num_operators: 15
+  days: 30
+  telemetry_interval_minutes: 5
+  random_seed: 42
+  start_date: "2026-01-01"

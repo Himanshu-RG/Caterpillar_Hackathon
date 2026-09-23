@@ -1,0 +1,199 @@
+{
+  "failure_prediction": {
+    "Logistic Regression": {
+      "Accuracy": 0.9763,
+      "Precision": 0.0,
+      "Recall": 0.0,
+      "F1": 0.0,
+      "ROC-AUC": 0.5,
+      "Confusion Matrix": [
+        [
+          12653,
+          307
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "Random Forest": {
+      "Accuracy": 0.9942,
+      "Precision": 0.0,
+      "Recall": 0.0,
+      "F1": 0.0,
+      "ROC-AUC": 0.5,
+      "Confusion Matrix": [
+        [
+          12885,
+          75
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "feature_names": [
+      "engine_hours",
+      "engine_rpm",
+      "engine_load_pct",
+      "coolant_temp_c",
+      "oil_pressure_bar",
+      "oil_temperature_c",
+      "fuel_rate_l_hr",
+      "hydraulic_pressure_bar",
+      "hydraulic_temp_c",
+      "machine_age_years",
+      "hydraulic_stress_index",
+      "temperature_deviation_from_baseline",
+      "engine_load_avg_1h",
+      "coolant_temp_avg_1h",
+      "oil_pressure_avg_1h",
+      "hydraulic_temp_avg_1h",
+      "hydraulic_temp_std_1h"
+    ],
+    "top_features_rf": [
+      {
+        "feature": "engine_hours",
+        "importance": 0.4079
+      },
+      {
+        "feature": "machine_age_years",
+        "importance": 0.2697
+      },
+      {
+        "feature": "fuel_rate_l_hr",
+        "importance": 0.1312
+      },
+      {
+        "feature": "hydraulic_temp_c",
+        "importance": 0.0338
+      },
+      {
+        "feature": "oil_pressure_bar",
+        "importance": 0.0288
+      },
+      {
+        "feature": "temperature_deviation_from_baseline",
+        "importance": 0.0241
+      },
+      {
+        "feature": "oil_pressure_avg_1h",
+        "importance": 0.0226
+      },
+      {
+        "feature": "hydraulic_temp_avg_1h",
+        "importance": 0.022
+      },
+      {
+        "feature": "engine_load_pct",
+        "importance": 0.0098
+      },
+      {
+        "feature": "coolant_temp_c",
+        "importance": 0.0093
+      },
+      {
+        "feature": "hydraulic_stress_index",
+        "importance": 0.0086
+      },
+      {
+        "feature": "coolant_temp_avg_1h",
+        "importance": 0.0081
+      },
+      {
+        "feature": "engine_load_avg_1h",
+        "importance": 0.0064
+      },
+      {
+        "feature": "hydraulic_pressure_bar",
+        "importance": 0.0058
+      },
+      {
+        "feature": "oil_temperature_c",
+        "importance": 0.0057
+      },
+      {
+        "feature": "hydraulic_temp_std_1h",
+        "importance": 0.0038
+      },
+      {
+        "feature": "engine_rpm",
+        "importance": 0.0025
+      }
+    ],
+    "test_class_distribution": {
+      "0": 1.0
+    },
+    "test_sample_count": 12960
+  },
+  "task_time_prediction": {
+    "Linear Regression": {
+      "MAE": 15.17,
+      "RMSE": 18.49,
+      "R2": 0.899,
+      "MAE_pct_of_mean": 6.78,
+      "MAE_pct_of_median": 7.26
+    },
+    "Random Forest Regressor": {
+      "MAE": 18.51,
+      "RMSE": 23.9,
+      "R2": 0.8313,
+      "MAE_pct_of_mean": 8.28,
+      "MAE_pct_of_median": 8.85
+    },
+    "target_mean": 223.61,
+    "target_median": 209.1,
+    "feature_names": [
+      "planned_quantity_tonnes",
+      "estimated_time_min",
+      "machine_age_years",
+      "weather_rainy",
+      "weather_windy",
+      "skill_expert",
+      "skill_beginner",
+      "type_Earth Excavation",
+      "type_Grading",
+      "type_Material Loading",
+      "type_Trenching"
+    ],
+    "test_sample_count": 90
+  },
+  "unsafe_behavior_prediction": {
+    "Random Forest Classifier": {
+      "Accuracy": 0.7367,
+      "Precision": 0.1535,
+      "Recall": 0.5987,
+      "F1": 0.2444,
+      "ROC-AUC": 0.7158,
+      "Confusion Matrix": [
+        [
+          8995,
+          3043
+        ],
+        [
+          370,
+          552
+        ]
+      ]
+    },
+    "feature_names": [
+      "speed_kmh",
+      "engine_load_pct",
+      "payload_tonnes",
+      "years_experience",
+      "historical_safety_score",
+      "visibility_km",
+      "wind_speed_kmh",
+      "safety_events_24h",
+      "average_cycle_time",
+      "idle_percentage"
+    ],
+    "test_class_distribution": {
+      "0": 0.9289,
+      "1": 0.0711
+    },
+    "test_sample_count": 12960
+  }
+}

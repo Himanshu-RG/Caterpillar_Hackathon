@@ -1,0 +1,62 @@
+{
+  "status": "PASSED",
+  "tables": {
+    "machine_master": {
+      "row_count": 10,
+      "col_count": 8,
+      "null_count": 0
+    },
+    "operators": {
+      "row_count": 15,
+      "col_count": 6,
+      "null_count": 0
+    },
+    "weather": {
+      "row_count": 2160,
+      "col_count": 11,
+      "null_count": 0
+    },
+    "telemetry": {
+      "row_count": 86400,
+      "col_count": 35,
+      "null_count": 0
+    },
+    "safety_events": {
+      "row_count": 2378,
+      "col_count": 12,
+      "null_count": 0
+    },
+    "maintenance": {
+      "row_count": 139,
+      "col_count": 8,
+      "null_count": 0
+    },
+    "incidents": {
+      "row_count": 761,
+      "col_count": 7,
+      "null_count": 0
+    },
+    "tasks": {
+      "row_count": 600,
+      "col_count": 18,
+      "null_count": 0
+    },
+    "ml_dataset": {
+      "row_count": 86400,
+      "col_count": 69,
+      "null_count": 0
+    }
+  },
+  "issues": [],
+  "telemetry_duplicate_records": 0,
+  "referential_integrity": {
+    "all_machines_mapped": true,
+    "all_operators_mapped": true
+  },
+  "physical_range_violations": [],
+  "target_distributions": {
+    "failure_within_50_hours_rate": 0.035,
+    "unsafe_operation_next_30min_rate": 0.0744,
+    "excessive_idle_next_hour_rate": 0.1097
+  }
+}

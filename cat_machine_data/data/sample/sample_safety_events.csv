@@ -1,0 +1,51 @@
+event_id,event_start,event_end,duration_min,machine_id,operator_id,seatbelt_status,proximity_alert,overspeed_alert,unsafe_operation,event_type,event_severity
+SEV00167,2026-01-01 00:40:00,2026-01-01 00:45:00,5.0,EXC002,OP1004,True,False,True,False,Overspeed,Medium
+SEV01571,2026-01-01 00:45:00,2026-01-01 00:50:00,5.0,EXC009,OP1014,True,True,False,False,Proximity Hazard,Medium
+SEV01158,2026-01-01 04:05:00,2026-01-01 04:10:00,5.0,EXC008,OP1012,True,True,False,False,Proximity Hazard,Medium
+SEV01159,2026-01-01 04:10:00,2026-01-01 04:15:00,5.0,EXC008,OP1012,True,False,False,True,Unsafe Operation,High
+SEV00001,2026-01-01 04:30:00,2026-01-01 04:35:00,5.0,EXC001,OP1002,True,True,False,True,Proximity Hazard,Medium
+SEV00168,2026-01-01 05:55:00,2026-01-01 06:00:00,5.0,EXC002,OP1004,True,False,False,True,Unsafe Operation,High
+SEV01572,2026-01-01 06:00:00,2026-01-01 06:05:00,5.0,EXC009,OP1013,True,False,False,True,Unsafe Operation,High
+SEV02051,2026-01-01 06:25:00,2026-01-01 06:30:00,5.0,LOD002,OP1002,True,False,True,False,Overspeed,Medium
+SEV00169,2026-01-01 06:50:00,2026-01-01 06:55:00,5.0,EXC002,OP1003,True,True,False,False,Proximity Hazard,Medium
+SEV01824,2026-01-01 06:50:00,2026-01-01 06:55:00,5.0,LOD001,OP1015,True,False,False,True,Unsafe Operation,High
+SEV02052,2026-01-01 06:55:00,2026-01-01 07:00:00,5.0,LOD002,OP1002,False,False,False,True,Seatbelt Violation,Low
+SEV01573,2026-01-01 07:00:00,2026-01-01 07:05:00,5.0,EXC009,OP1013,False,False,False,True,Seatbelt Violation,Low
+SEV00655,2026-01-01 07:10:00,2026-01-01 07:15:00,5.0,EXC007,OP1012,True,True,False,True,Proximity Hazard,Medium
+SEV00427,2026-01-01 07:15:00,2026-01-01 07:20:00,5.0,EXC005,OP1007,True,True,False,False,Proximity Hazard,Medium
+SEV00656,2026-01-01 07:20:00,2026-01-01 07:25:00,5.0,EXC007,OP1012,False,False,False,True,Seatbelt Violation,Low
+SEV00657,2026-01-01 07:25:00,2026-01-01 07:30:00,5.0,EXC007,OP1012,True,False,False,True,Unsafe Operation,High
+SEV01825,2026-01-01 07:50:00,2026-01-01 07:55:00,5.0,LOD001,OP1015,True,False,False,True,Unsafe Operation,High
+SEV00658,2026-01-01 07:55:00,2026-01-01 08:00:00,5.0,EXC007,OP1012,False,False,False,True,Seatbelt Violation,Low
+SEV01574,2026-01-01 07:55:00,2026-01-01 08:00:00,5.0,EXC009,OP1013,False,False,False,True,Seatbelt Violation,Low
+SEV02201,2026-01-01 08:10:00,2026-01-01 08:15:00,5.0,LOD003,OP1004,True,False,False,True,Unsafe Operation,High
+SEV00170,2026-01-01 08:15:00,2026-01-01 08:20:00,5.0,EXC002,OP1003,True,True,False,False,Proximity Hazard,Medium
+SEV01160,2026-01-01 08:55:00,2026-01-01 09:00:00,5.0,EXC008,OP1011,False,False,False,True,Seatbelt Violation,Low
+SEV00002,2026-01-01 09:15:00,2026-01-01 09:20:00,5.0,EXC001,OP1001,True,False,True,False,Overspeed,Medium
+SEV00428,2026-01-01 09:20:00,2026-01-01 09:25:00,5.0,EXC005,OP1007,True,False,True,False,Overspeed,Medium
+SEV00429,2026-01-01 09:30:00,2026-01-01 09:35:00,5.0,EXC005,OP1007,False,False,False,True,Seatbelt Violation,Low
+SEV00659,2026-01-01 09:40:00,2026-01-01 09:45:00,5.0,EXC007,OP1012,False,False,False,True,Seatbelt Violation,Low
+SEV01161,2026-01-01 09:40:00,2026-01-01 09:45:00,5.0,EXC008,OP1011,True,False,True,False,Overspeed,Medium
+SEV00660,2026-01-01 10:10:00,2026-01-01 10:15:00,5.0,EXC007,OP1012,False,False,False,True,Seatbelt Violation,Low
+SEV01162,2026-01-01 10:15:00,2026-01-01 10:20:00,5.0,EXC008,OP1011,True,True,False,False,Proximity Hazard,Medium
+SEV01163,2026-01-01 10:20:00,2026-01-01 10:25:00,5.0,EXC008,OP1011,True,False,True,False,Overspeed,Medium
+SEV01826,2026-01-01 10:30:00,2026-01-01 10:35:00,5.0,LOD001,OP1015,False,False,False,True,Seatbelt Violation,Low
+SEV00003,2026-01-01 10:45:00,2026-01-01 10:50:00,5.0,EXC001,OP1001,True,False,True,False,Overspeed,High
+SEV01575,2026-01-01 11:00:00,2026-01-01 11:05:00,5.0,EXC009,OP1013,True,True,False,False,Proximity Hazard,Medium
+SEV01827,2026-01-01 11:25:00,2026-01-01 11:30:00,5.0,LOD001,OP1015,True,True,False,False,Proximity Hazard,Medium
+SEV00004,2026-01-01 11:35:00,2026-01-01 11:40:00,5.0,EXC001,OP1001,True,False,True,False,Overspeed,Medium
+SEV00005,2026-01-01 11:45:00,2026-01-01 11:55:00,10.0,EXC001,OP1001,True,False,True,False,Overspeed,Medium
+SEV00430,2026-01-01 12:05:00,2026-01-01 12:10:00,5.0,EXC005,OP1007,True,True,False,False,Proximity Hazard,Medium
+SEV01828,2026-01-01 12:10:00,2026-01-01 12:15:00,5.0,LOD001,OP1015,False,False,False,True,Seatbelt Violation,Low
+SEV02053,2026-01-01 12:15:00,2026-01-01 12:20:00,5.0,LOD002,OP1002,False,False,False,True,Seatbelt Violation,Low
+SEV02202,2026-01-01 12:20:00,2026-01-01 12:25:00,5.0,LOD003,OP1004,True,True,False,False,Proximity Hazard,Medium
+SEV01164,2026-01-01 12:55:00,2026-01-01 13:00:00,5.0,EXC008,OP1011,True,False,False,True,Unsafe Operation,High
+SEV02054,2026-01-01 13:05:00,2026-01-01 13:10:00,5.0,LOD002,OP1002,False,False,False,True,Seatbelt Violation,Low
+SEV00661,2026-01-01 13:15:00,2026-01-01 13:20:00,5.0,EXC007,OP1012,False,False,False,True,Seatbelt Violation,Low
+SEV00006,2026-01-01 13:30:00,2026-01-01 13:35:00,5.0,EXC001,OP1001,False,False,False,True,Seatbelt Violation,Low
+SEV00431,2026-01-01 13:30:00,2026-01-01 13:35:00,5.0,EXC005,OP1007,True,True,False,False,Proximity Hazard,Medium
+SEV01576,2026-01-01 13:40:00,2026-01-01 13:45:00,5.0,EXC009,OP1013,True,False,True,False,Overspeed,Medium
+SEV00662,2026-01-01 14:00:00,2026-01-01 14:05:00,5.0,EXC007,OP1012,True,False,False,True,Unsafe Operation,High
+SEV00663,2026-01-01 14:05:00,2026-01-01 14:10:00,5.0,EXC007,OP1012,True,False,True,False,Overspeed,Medium
+SEV00664,2026-01-01 14:15:00,2026-01-01 14:20:00,5.0,EXC007,OP1012,True,True,False,False,Proximity Hazard,Medium
+SEV01829,2026-01-01 14:20:00,2026-01-01 14:25:00,5.0,LOD001,OP1015,False,False,False,True,Seatbelt Violation,Low

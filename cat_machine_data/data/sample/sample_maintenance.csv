@@ -1,0 +1,51 @@
+maintenance_id,timestamp,machine_id,maintenance_type,component,severity,engine_hours,description
+MNT00001,2026-01-01 05:50:00,EXC001,Inspection,Engine,Low,1911.4,Scheduled visual inspection and diagnostic trouble code read
+MNT00028,2026-01-01 05:50:00,EXC004,Inspection,Engine,Low,4838.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00099,2026-01-01 05:50:00,LOD001,Inspection,Hydraulic System,Low,9012.4,Routine diagnostic pressure check across main pump relief valves
+MNT00042,2026-01-02 05:50:00,EXC005,Inspection,Hydraulic System,Low,6879.8,Routine diagnostic pressure check across main pump relief valves
+MNT00114,2026-01-02 05:50:00,LOD002,Inspection,Engine,Low,7410.3,Scheduled visual inspection and diagnostic trouble code read
+MNT00100,2026-01-03 05:50:00,LOD001,Inspection,Engine,Low,9041.5,Scheduled visual inspection and diagnostic trouble code read
+MNT00002,2026-01-04 05:50:00,EXC001,Inspection,Engine,Low,1959.2,Scheduled visual inspection and diagnostic trouble code read
+MNT00015,2026-01-04 05:50:00,EXC002,Inspection,Engine,Low,10409.3,Scheduled visual inspection and diagnostic trouble code read
+MNT00029,2026-01-04 05:50:00,EXC004,Inspection,Engine,Low,4856.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00066,2026-01-04 10:40:00,EXC008,Inspection,Undercarriage,Low,8952.8,Standard pre-shift undercarriage physical inspection
+MNT00101,2026-01-04 22:00:00,LOD001,Preventive,Transmission,Medium,9069.6,Transmission oil check and breather cleaning
+MNT00003,2026-01-05 05:50:00,EXC001,Inspection,Undercarriage,Low,1974.8,Standard pre-shift undercarriage physical inspection
+MNT00043,2026-01-05 05:50:00,EXC005,Inspection,Undercarriage,Low,6923.9,Standard pre-shift undercarriage physical inspection
+MNT00102,2026-01-05 05:50:00,LOD001,Inspection,Engine,Low,9070.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00115,2026-01-05 05:50:00,LOD002,Inspection,Undercarriage,Low,7457.9,Standard pre-shift undercarriage physical inspection
+MNT00128,2026-01-05 08:00:00,LOD003,Inspection,Engine,Low,10905.0,Scheduled visual inspection and diagnostic trouble code read
+MNT00053,2026-01-05 11:25:00,EXC007,Inspection,Hydraulic System,Low,9479.5,Routine diagnostic pressure check across main pump relief valves
+MNT00084,2026-01-05 16:25:00,EXC009,Inspection,Engine,Low,1679.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00004,2026-01-05 22:00:00,EXC001,Preventive,Cooling System,Medium,1987.7,"Radiator blowout, coolant concentration test and belt check"
+MNT00044,2026-01-05 22:00:00,EXC005,Preventive,Transmission,Medium,6935.3,Transmission oil check and breather cleaning
+MNT00116,2026-01-05 22:00:00,LOD002,Preventive,Transmission,Medium,7470.0,Transmission oil check and breather cleaning
+MNT00016,2026-01-06 05:50:00,EXC002,Inspection,Undercarriage,Low,10439.8,Standard pre-shift undercarriage physical inspection
+MNT00085,2026-01-06 05:50:00,EXC009,Inspection,Undercarriage,Low,1685.3,Standard pre-shift undercarriage physical inspection
+MNT00005,2026-01-07 05:50:00,EXC001,Inspection,Undercarriage,Low,2003.9,Standard pre-shift undercarriage physical inspection
+MNT00017,2026-01-07 05:50:00,EXC002,Inspection,Undercarriage,Low,10453.9,Standard pre-shift undercarriage physical inspection
+MNT00030,2026-01-07 05:50:00,EXC004,Inspection,Undercarriage,Low,4875.1,Standard pre-shift undercarriage physical inspection
+MNT00067,2026-01-07 05:50:00,EXC008,Inspection,Undercarriage,Low,8992.4,Standard pre-shift undercarriage physical inspection
+MNT00117,2026-01-07 05:50:00,LOD002,Inspection,Undercarriage,Low,7487.2,Standard pre-shift undercarriage physical inspection
+MNT00129,2026-01-07 05:50:00,LOD003,Inspection,Undercarriage,Low,10934.7,Standard pre-shift undercarriage physical inspection
+MNT00086,2026-01-07 22:00:00,EXC009,Preventive,Transmission,Medium,1712.8,Transmission oil check and breather cleaning
+MNT00018,2026-01-08 05:50:00,EXC002,Inspection,Hydraulic System,Low,10469.5,Routine diagnostic pressure check across main pump relief valves
+MNT00031,2026-01-08 05:50:00,EXC004,Inspection,Engine,Low,4882.4,Scheduled visual inspection and diagnostic trouble code read
+MNT00068,2026-01-08 05:50:00,EXC008,Inspection,Hydraulic System,Low,9006.8,Routine diagnostic pressure check across main pump relief valves
+MNT00087,2026-01-08 05:50:00,EXC009,Inspection,Hydraulic System,Low,1714.1,Routine diagnostic pressure check across main pump relief valves
+MNT00006,2026-01-08 09:40:00,EXC001,Preventive,Cooling System,Medium,2023.3,"Radiator blowout, coolant concentration test and belt check"
+MNT00054,2026-01-08 14:15:00,EXC007,Preventive,Cooling System,Medium,9523.0,"Radiator blowout, coolant concentration test and belt check"
+MNT00069,2026-01-08 22:00:00,EXC008,Preventive,Cooling System,Medium,9019.8,"Radiator blowout, coolant concentration test and belt check"
+MNT00055,2026-01-09 05:50:00,EXC007,Inspection,Undercarriage,Low,9529.0,Standard pre-shift undercarriage physical inspection
+MNT00070,2026-01-09 05:50:00,EXC008,Inspection,Undercarriage,Low,9020.8,Standard pre-shift undercarriage physical inspection
+MNT00118,2026-01-09 05:50:00,LOD002,Inspection,Engine,Low,7518.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00019,2026-01-09 22:00:00,EXC002,Preventive,Transmission,Medium,10499.6,Transmission oil check and breather cleaning
+MNT00130,2026-01-09 22:00:00,LOD003,Preventive,Cooling System,Medium,10977.7,"Radiator blowout, coolant concentration test and belt check"
+MNT00045,2026-01-10 05:50:00,EXC005,Inspection,Undercarriage,Low,6998.4,Standard pre-shift undercarriage physical inspection
+MNT00071,2026-01-10 05:50:00,EXC008,Inspection,Undercarriage,Low,9034.8,Standard pre-shift undercarriage physical inspection
+MNT00007,2026-01-11 05:50:00,EXC001,Inspection,Engine,Low,2065.1,Scheduled visual inspection and diagnostic trouble code read
+MNT00103,2026-01-11 14:25:00,LOD001,Inspection,Engine,Low,9170.7,Scheduled visual inspection and diagnostic trouble code read
+MNT00032,2026-01-12 05:50:00,EXC004,Inspection,Undercarriage,Low,4906.4,Standard pre-shift undercarriage physical inspection
+MNT00104,2026-01-12 05:50:00,LOD001,Inspection,Engine,Low,9178.6,Scheduled visual inspection and diagnostic trouble code read
+MNT00119,2026-01-12 05:50:00,LOD002,Inspection,Hydraulic System,Low,7566.2,Routine diagnostic pressure check across main pump relief valves
+MNT00008,2026-01-13 05:50:00,EXC001,Inspection,Undercarriage,Low,2097.0,Standard pre-shift undercarriage physical inspection
