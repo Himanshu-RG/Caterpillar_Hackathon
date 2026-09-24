@@ -215,6 +215,13 @@ class IncidentResponse(BaseModel):
     description: str
 
 
+class CreateMaintenanceRequest(BaseModel):
+    component: str = "Hydraulic System"
+    severity: str = "High"
+    description: str
+    engine_hours: float = 0.0
+
+
 class CreateIncidentRequest(BaseModel):
     machine_id: str
     operator_id: Optional[str] = "OP001"
@@ -227,6 +234,7 @@ class CreateIncidentRequest(BaseModel):
 class ChatRequest(BaseModel):
     machine_id: str
     message: str
+    api_key: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -235,3 +243,5 @@ class ChatResponse(BaseModel):
     timestamp: str
     context_signals: List[str]
     suggested_actions: List[str]
+    urgency: Optional[str] = "NORMAL"
+    model_used: Optional[str] = None

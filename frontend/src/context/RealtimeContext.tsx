@@ -130,7 +130,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activeInsights, setActiveInsights] = useState<Insight[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [criticalAlert, setCriticalAlert] = useState<CriticalAlertInfo | null>(null);
+  const criticalAlertRef = useRef<CriticalAlertInfo | null>(null);
+  const lastCriticalAlertAtRef = useRef(0);
   const lastDismissedHazardRef = useRef<string | null>(null);
+  const lastDismissedHealthRef = useRef(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [activeScenario, setActiveScenario] = useState<string>('healthy');
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
@@ -195,10 +198,29 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setCurrentTask(null);
   }, []);
 
+  // Raise one alert per condition. Repeated telemetry packets must not reopen the
+  // same modal while the operator is acknowledging or switching views.
+  const raiseCriticalAlert = useCallback((alert: CriticalAlertInfo) => {
+    const current = criticalAlertRef.current;
+    if (current?.title === alert.title || current?.id === alert.id) return;
+    // Immediate safety hazards have priority over health advisories.
+    if (current?.severity === 'CRITICAL' && alert.id.includes('HEALTH')) return;
+
+    // Telemetry can arrive every couple of seconds in demo mode. Keep the
+    // condition visible through the status indicators, but do not interrupt
+    // the operator with another modal/siren more than once every 15 seconds.
+    const now = Date.now();
+    if (now - lastCriticalAlertAtRef.current < 15000) return;
+
+    lastCriticalAlertAtRef.current = now;
+    criticalAlertRef.current = alert;
+    setCriticalAlert(alert);
+  }, []);
+
   // Security Alert Trigger (accessible everywhere and testable)
   const triggerSecurityAlert = useCallback((info?: Partial<CriticalAlertInfo>) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    setCriticalAlert({
+    raiseCriticalAlert({
       id: info?.id || `ALERT-SEC-${Date.now()}`,
       title: info?.title || 'SECURITY ALERT: UNAUTHORIZED PERIMETER INTRUSION',
       message: info?.message || 'Ground personnel or unauthorized vehicle detected inside the heavy equipment active swing and blast boundary (< 5.0m).',
@@ -207,7 +229,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       machine_id: info?.machine_id || activeMachineId,
       recommended_action: info?.recommended_action || 'HALT MACHINE MOTION IMMEDIATELY. Sound in-cab horn, engage hydraulic safety lock, and verify ground spotter clear.',
     });
-  }, [activeMachineId]);
+  }, [activeMachineId, raiseCriticalAlert]);
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<any>(null);
@@ -265,7 +287,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // If initial machine state has an unfastened seatbelt or proximity hazard, trigger the Security Alert prompt box
         if (!data.current_state.seatbelt_status && lastDismissedHazardRef.current !== 'seatbelt') {
           const timeStr = data.current_state.last_timestamp ? data.current_state.last_timestamp.slice(11, 19) : new Date().toLocaleTimeString();
-          setCriticalAlert({
+          raiseCriticalAlert({
             id: `CRIT-SEAT-${Date.now()}`,
             title: 'IMMEDIATE SAFETY ALERT: SEATBELT UNFASTENED',
             message: 'Seatbelt is unfastened while machine is active. Fasten safety harness before operating hydraulics or tramming.',
@@ -276,7 +298,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
         } else if (data.current_state.proximity_alert && lastDismissedHazardRef.current !== 'proximity') {
           const timeStr = data.current_state.last_timestamp ? data.current_state.last_timestamp.slice(11, 19) : new Date().toLocaleTimeString();
-          setCriticalAlert({
+          raiseCriticalAlert({
             id: `CRIT-PROX-${Date.now()}`,
             title: 'SECURITY ALERT: WORKER / OBSTACLE IN PERIMETER',
             message: 'Proximity radar detected an obstacle or personnel within equipment danger zone (< 3.5m).',
@@ -315,7 +337,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (err) {
       console.warn('[RealtimeContext] Could not fetch initial dashboard:', err);
     }
-  }, [activeMachineId]);
+  }, [activeMachineId, raiseCriticalAlert]);
 
   useEffect(() => {
     refreshDashboard();
@@ -420,10 +442,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               lastDismissedHazardRef.current = null;
             }
 
-            // Check for critical alert popup
+            // Check for critical alert popup. The stable title is intentional:
+            // it deduplicates the 1Hz/telemetry stream until the condition clears.
             if (prox && lastDismissedHazardRef.current !== 'proximity') {
-              setCriticalAlert({
-                id: `CRIT-PROX-${Date.now()}`,
+              raiseCriticalAlert({
+                id: `CRIT-PROX-${packet.machine_id}`,
                 title: 'SECURITY ALERT: WORKER / OBSTACLE IN PERIMETER',
                 message: 'Personnel or structure detected within obstacle perimeter (< 3.5m).',
                 severity: 'CRITICAL',
@@ -432,8 +455,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 recommended_action: 'HALT MACHINE MOTION IMMEDIATELY. Sound horn, engage safety brake, and notify supervisor.',
               });
             } else if (!sb && lastDismissedHazardRef.current !== 'seatbelt') {
-              setCriticalAlert({
-                id: `CRIT-SEAT-${Date.now()}`,
+              raiseCriticalAlert({
+                id: `CRIT-SEAT-${packet.machine_id}`,
                 title: 'IMMEDIATE SAFETY ALERT: SEATBELT UNFASTENED',
                 message: 'Operator seatbelt is unfastened while machine is active. Operating heavy equipment without restraint poses severe hazard.',
                 severity: 'CRITICAL',
@@ -473,6 +496,39 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (liveStatus === 'CRITICAL') liveTrend = 'CRITICAL';
             else if (liveStatus === 'ATTENTION') liveTrend = 'DEGRADING';
 
+            const recommendations = liveStatus === 'CRITICAL'
+              ? [
+                  'STOP ACTIVE OPERATION and move the machine to a safe idle state.',
+                  'Shut down the engine if temperature or oil pressure continues worsening.',
+                  'Notify the site supervisor and request an urgent maintenance inspection.',
+                ]
+              : liveStatus === 'ATTENTION'
+              ? [
+                  'Reduce heavy-load cycles and monitor hydraulic temperature and oil pressure.',
+                  'Schedule a hydraulic cooler, filter, and lubrication inspection before the next shift.',
+                ]
+              : ['Continue routine operation and visual inspections.'];
+
+            if (liveStatus === 'CRITICAL') {
+              if (!lastDismissedHealthRef.current) {
+                raiseCriticalAlert({
+                  id: `CRIT-HEALTH-${packet.machine_id}`,
+                  title: 'CRITICAL MACHINE HEALTH: STOP OPERATION',
+                  message: `Machine health is critical. Hydraulic temperature, oil pressure, coolant temperature, or predicted failure risk has crossed the emergency threshold.`,
+                  severity: 'CRITICAL',
+                  time: timeStr,
+                  machine_id: packet.machine_id,
+                  recommended_action: recommendations.join(' '),
+                });
+              }
+            } else {
+              lastDismissedHealthRef.current = false;
+              if (criticalAlertRef.current?.id === `CRIT-HEALTH-${packet.machine_id}`) {
+                criticalAlertRef.current = null;
+                setCriticalAlert(null);
+              }
+            }
+
             setDerivedHealth((prev) => ({
               machine_id: packet.machine_id || prev?.machine_id || activeMachineId,
               health_status: liveStatus,
@@ -481,7 +537,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               prediction_horizon: '50 operating hours',
               active_anomalies: hyd >= 80 ? ['Elevated Hydraulic Temperature'] : [],
               recent_fault_code: packet.telemetry?.fault_code || prev?.recent_fault_code || 'NONE',
-              recommendations: packet.predictions?.signals ?? prev?.recommendations ?? [],
+              recommendations,
             }));
           }
 
@@ -539,7 +595,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setConnectionStatus('DISCONNECTED');
       }
     }
-  }, [activeMachineId]);
+  }, [activeMachineId, raiseCriticalAlert]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -602,8 +658,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         criticalAlert.title.includes('WORKER')
       ) {
         lastDismissedHazardRef.current = 'proximity';
+      } else if (criticalAlert.id.includes('HEALTH')) {
+        lastDismissedHealthRef.current = true;
       }
     }
+    criticalAlertRef.current = null;
     setCriticalAlert(null);
   };
 

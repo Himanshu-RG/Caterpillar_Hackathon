@@ -228,3 +228,52 @@ When connected, clients receive real-time JSON packets whenever a new telemetry 
 | `excessive_idle`| `EXC004` | Cat 323 | Chronic staging and waiting queues | Idling $> 75\%$; calculates wasted diesel (liters and USD); triggers auto-shutdown recommendation |
 | `unsafe` | `EXC008` | Cat 320 GC | Hazardous operator behavior | Immediate seatbelt and proximity rule violations; elevated 30-min predictive risk |
 | `productivity` | `LOD001` | Cat 950 GC | Heavy aggregate truck loading | High utilization ($> 85\%$), rapid cycle pace, and optimal fuel burn |
+
+---
+
+## 6. Google Gemini AI Diagnostic Advisor Architecture
+
+The in-cab AI companion (`POST /api/assistant/chat`) integrates Google's **Gemini API** (`gemini-flash-lite-latest` / `gemini-2.5-flash`) via the `google-genai` Python SDK to perform real-time generative diagnostic reasoning.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Operator as In-Cab Operator
+    participant UI as AssistantDrawer (React)
+    participant API as FastAPI Assistant Endpoint
+    participant DataHub as SQLAlchemy Data Hub
+    participant Specs as CAT Machine Specs Catalog
+    participant GeminiAdv as Gemini Diagnostic Advisor
+    participant Gemini as Google Gemini Flash API
+
+    Operator->>UI: Types query or clicks diagnostic prompt chip
+    UI->>API: POST /api/assistant/chat { machine_id, message, api_key? }
+    API->>DataHub: Query current state, ML failure risk, active task, recent safety events
+    API->>Specs: Fetch rated payload, bucket cap, and physical tolerances for model
+    API->>GeminiAdv: Synthesize prompt context with real-time CAN-bus readings
+    
+    alt Gemini API Key Available
+        GeminiAdv->>Gemini: generate_content(model, system_instruction, user_prompt, response_mime_type="application/json")
+        Gemini-->>GeminiAdv: Return structured JSON { reply, context_signals, suggested_actions, urgency, model_used }
+    else Offline or Key Missing
+        GeminiAdv->>GeminiAdv: Execute deterministic Caterpillar Telematics Engine
+    end
+
+    GeminiAdv-->>API: Consolidated diagnostic payload
+    API-->>UI: Return ChatResponse { reply, context_signals, suggested_actions, urgency, model_used }
+    UI-->>Operator: Render urgency badge, diagnosis, live signal chips, and action checklist
+```
+
+### Context Synthesis Schema Injected into Gemini:
+1. **Machine Model Engineering Limits (`CAT_MACHINE_SPECS`)**:
+   - Model name, equipment type, operating weight, rated vs max payload.
+   - Design operational ceilings: Hydraulic temp (`45.0 - 80.0 °C`), hydraulic pressure (`150 - 320 bar`), oil gallery pressure (`2.8 - 5.0 bar`, warning `< 2.5 bar`).
+2. **Instantaneous CAN-bus Telematics**:
+   - Exact physical readings (`hydraulic_temp_c`, `oil_pressure_bar`, `engine_rpm`, `engine_load_pct`, `coolant_temp_c`, `speed_kmh`, `payload_tonnes`).
+3. **ML Failure & Safety Predictions**:
+   - 50-hour failure probability %, risk level (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`), top driving telemetry features.
+4. **Active Work Order Dispatch**:
+   - Task type, target tonnes, actual tonnes moved, cycle count, cycle time variance, remaining estimated minutes.
+5. **Active Intelligence Insights**:
+   - High-priority operational recommendations from the rule engine.
+

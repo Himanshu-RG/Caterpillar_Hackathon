@@ -177,6 +177,19 @@ python scripts/load_historical_data.py
 python scripts/train_and_save_models.py
 ```
 
+### 8.1.1 Enabling the Gemini AI Companion
+
+The in-cab assistant uses the backend's live machine context and Gemini's generative reasoning. Configure the key on the backend before starting FastAPI:
+
+```powershell
+Copy-Item .env.example .env
+# Edit .env and set GEMINI_API_KEY=<your Google AI Studio key>
+```
+
+The assistant sends Gemini the selected machine model, engineering tolerances, current CAN-bus telemetry, predictive failure risk, active task, recent safety events, and active intelligence recommendations. If Gemini is unavailable or the key is not configured, the deterministic Caterpillar Telematics Engine remains available as an offline fallback.
+
+The frontend exposes `GET /api/assistant/status` and labels each response with the active model. Keep the API key in the backend environment for normal operation; the optional key field in the UI is intended only for local/demo use.
+
 ### 8.2 Starting the FastAPI Backend
 ```bash
 python scripts/run_backend.py
@@ -222,4 +235,3 @@ Run the comprehensive 34-test suite covering deterministic generation, schema in
 ```bash
 pytest tests/ -v
 ```
-

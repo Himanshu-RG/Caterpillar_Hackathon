@@ -206,4 +206,15 @@ export interface ChatResponse {
   timestamp: string;
   context_signals: string[];
   suggested_actions: string[];
+  urgency?: 'NORMAL' | 'ATTENTION' | 'CRITICAL';
+  model_used?: string;
+}
+
+export interface AssistantStatus {
+  gemini_active: boolean;
+  gemini_configured?: boolean;
+  active_model: string;
+  supported_models: string[];
+  telematics_integration: string;
+  last_error?: string | null;
 }

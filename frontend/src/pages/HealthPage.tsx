@@ -12,6 +12,7 @@ import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { RiskGauge } from '../components/charts/RiskGauge';
 import { LiveTelemetryChart } from '../components/charts/LiveTelemetryChart';
+import { createMaintenanceRequest } from '../api/maintenance';
 
 export const HealthPage: React.FC = () => {
   const {
@@ -20,14 +21,31 @@ export const HealthPage: React.FC = () => {
     latestTelemetry,
     derivedHealth,
     failureRisk,
+    setIsPaused,
   } = useRealtime();
 
   const [serviceRequested, setServiceRequested] = useState(false);
+  const [serviceRequestError, setServiceRequestError] = useState<string | null>(null);
 
   const hydTemp = latestTelemetry?.hydraulic_temp ?? dashboard?.current_state?.hydraulic_temp_c ?? 71;
   const oilPress = latestTelemetry?.oil_pressure ?? dashboard?.current_state?.oil_pressure_bar ?? 3.8;
   const coolantTemp = latestTelemetry?.coolant_temp ?? dashboard?.current_state?.coolant_temp_c ?? 82;
   const loadPct = latestTelemetry?.load_pct ?? dashboard?.current_state?.engine_load_pct ?? 61;
+
+  const requestMaintenance = async () => {
+    setServiceRequestError(null);
+    try {
+      await createMaintenanceRequest(activeMachineId, {
+        component: 'Hydraulic System / Engine Lubrication',
+        severity: derivedHealth?.health_status === 'CRITICAL' ? 'Critical' : 'High',
+        description: derivedHealth?.recommendations?.join(' ') || 'Operator requested predictive maintenance inspection.',
+        engine_hours: dashboard?.current_state?.engine_hours ?? 0,
+      });
+      setServiceRequested(true);
+    } catch {
+      setServiceRequestError('Could not submit the work order. Confirm that the backend is running.');
+    }
+  };
 
   const isDegrading = (failureRisk?.probability ?? 0) > 0.35 || hydTemp > 80;
 
@@ -140,6 +158,49 @@ export const HealthPage: React.FC = () => {
       </div>
 
       {/* Predictive Insight & Maintenance Recommendation */}
+      {derivedHealth?.health_status === 'CRITICAL' && (
+        <Card
+          title="URGENT OPERATOR ACTION REQUIRED"
+          subtitle="Do not continue heavy operation until the machine is inspected"
+          icon={<HeartPulse className="w-4 h-4 text-rose-500" />}
+          className="border-2 border-rose-500/70 bg-rose-50/60 dark:bg-rose-950/20"
+        >
+          <div className="space-y-3 text-xs">
+            <p className="font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">
+              Critical health status: stop active work, move to a safe idle state, and contact the site supervisor.
+            </p>
+            <ol className="list-decimal pl-5 space-y-1 text-slate-700 dark:text-slate-200">
+              {(derivedHealth.recommendations.length > 0
+                ? derivedHealth.recommendations
+                : [
+                    'Stop active operation and move the machine to a safe idle state.',
+                    'Shut down the engine if temperature or oil pressure continues worsening.',
+                    'Request an urgent maintenance inspection before restarting.',
+                  ]).map((action) => <li key={action}>{action}</li>)}
+            </ol>
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button
+                variant="danger"
+                size="md"
+                onClick={() => setIsPaused(true)}
+                className="font-black uppercase tracking-wider"
+              >
+                Stop Operation / Acknowledge
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={requestMaintenance}
+                className="font-black uppercase tracking-wider"
+                icon={<Wrench className="w-4 h-4 mr-1" />}
+              >
+                Request Urgent Maintenance
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card
           title="Predictive Intelligence Insight"
@@ -195,12 +256,15 @@ export const HealthPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="md"
-                onClick={() => setServiceRequested(true)}
+                onClick={requestMaintenance}
                 className="w-full uppercase tracking-wider font-black text-xs py-3"
                 icon={<Wrench className="w-4 h-4 mr-1" />}
               >
                 Create Maintenance Service Request
               </Button>
+            )}
+            {serviceRequestError && (
+              <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">{serviceRequestError}</p>
             )}
           </div>
         </Card>

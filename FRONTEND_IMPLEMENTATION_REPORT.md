@@ -59,6 +59,13 @@ We have delivered the comprehensive **FINAL FRONTEND** for the Caterpillar Intel
 - Measurable behavioral deviations compared against 90-day certified operator baselines.
 - Incident logging registry with direct backend submission.
 
+### D. Google Gemini AI Diagnostic Machine Companion (`AssistantDrawer.tsx`)
+- In-cab flyout co-pilot integrating Google's **Gemini API** (`gemini-flash-lite-latest` / `gemini-2.5-flash`).
+- Ingests Caterpillar machine model specifications (CAT 320 GC, 323, 336, 349, 950 GC, 966) and live CAN-bus telematics.
+- Translates sensor telemetry into root-cause mechanical diagnoses, urgency classifications (`CRITICAL`, `ATTENTION`, `NORMAL`), live model telemetry chips, and prioritized operator action checklists with checkmarks.
+- Includes secure in-cab key configuration accordion, allowing direct entry of `GEMINI_API_KEY` (saved to local storage) and seamless offline fallback to the deterministic Caterpillar Telematics Engine.
+
+
 ---
 
 ## 3. Persistent Status Strip & Offline Resilience

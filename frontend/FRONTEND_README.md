@@ -99,5 +99,8 @@ VITE_WS_BASE_URL=ws://localhost:8000
 
 * **Centralized Real-Time State (`RealtimeProvider`)**: Single WebSocket connection per machine with automatic exponential backoff reconnection (1s to 8s) and bounded sliding-window memory (max 120 points).
 * **High-Priority Hazard Interrupt Modal (`CriticalAlertModal`)**: Instant modal takeover with synthesized warning tones via the Web Audio API when 360° proximity radar or unbuckled seatbelts in motion are detected.
-* **Live In-Cab AI Assistant (`AssistantDrawer`)**: Flyout companion answering queries against current telematics, ML probabilities, and active tasks.
+* **Google Gemini AI Machine Companion (`AssistantDrawer`)**: In-cab generative diagnostic advisor powered by Google Gemini (`gemini-flash-lite-latest` / `gemini-2.5-flash`). Combines Caterpillar machine model specifications (CAT 320 GC, 323, 336, 349, 950 GC, 966) with live CAN-bus telematics to diagnose thermodynamic anomalies, evaluate operating limits, and provide step-by-step operator actions with urgency pills. Includes in-cab key settings accordion and offline fallback.
+* **Daylight (Light) & Night (Dark) Theme System**: Defaulted to high-visibility Light mode for bright outdoor sunlight conditions, with instant toggle to high-contrast Caterpillar Night mode.
+* **Interactive Hardware-In-The-Loop Training Mode**: Step-by-step interactive onboarding tutorials for CAT D6 Bulldozers and CAT Excavators that validate physical operator controls against incoming telematics packets (seatbelt latch, hydraulic lockout release, implement curl) with real-time scoring.
 * **Production Build**: Verified with `cmd /c "npm run build"` producing optimized gzip assets with zero TypeScript or bundling errors.
+

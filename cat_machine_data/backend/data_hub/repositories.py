@@ -330,6 +330,31 @@ class MaintenanceRepository:
             .all()
         )
 
+    def create_request(
+        self,
+        maintenance_id: str,
+        timestamp: str,
+        machine_id: str,
+        component: str,
+        severity: str,
+        engine_hours: float,
+        description: str,
+    ) -> MaintenanceRecord:
+        record = MaintenanceRecord(
+            maintenance_id=maintenance_id,
+            timestamp=timestamp,
+            machine_id=machine_id,
+            maintenance_type="Operator Service Request",
+            component=component,
+            severity=severity,
+            engine_hours=engine_hours,
+            description=description,
+        )
+        self.db.add(record)
+        self.db.commit()
+        self.db.refresh(record)
+        return record
+
 
 class IncidentRepository:
     def __init__(self, db: Session):
